@@ -1,0 +1,6 @@
+@SoundEffectLibrary_HostAddress = http://localhost:5022
+
+GET {{SoundEffectLibrary_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
