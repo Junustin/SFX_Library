@@ -5,6 +5,9 @@
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";
         public int CategoryId { get; set; }
+
+        public Category Category { get; set; } = null!;
     }
     public record CreateAudioAssetRequest(string Title, string Description, int CategoryId);
+    public record CreateAudioAssetResponse(Guid Id,string Title, string Description, int CategoryId);
 }

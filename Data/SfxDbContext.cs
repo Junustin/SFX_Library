@@ -20,9 +20,9 @@ namespace SoundEffectLibrary.Data
                 builder.ToTable("audioassets", "assets");
                 builder.HasKey(a => a.Id);
 
-                builder.HasOne<Category>()
+                builder.HasOne(a => a.Category)
                     .WithMany()
-                    .HasForeignKey(c => c.CategoryId);
+                    .HasForeignKey(a => a.CategoryId);
             });
 
             modelBuilder.Entity<Category>(builder =>
