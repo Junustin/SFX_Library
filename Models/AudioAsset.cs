@@ -7,6 +7,7 @@
         public int CategoryId { get; set; }
 
         public Category Category { get; set; } = null!;
+        public ICollection<AudioFile> AudioFiles { get; set; } = new List<AudioFile>();
     }
     public record CreateAudioAssetRequest(string Title, string Description, int CategoryId);
     public record CreateAudioAssetResponse(Guid Id,string Title, string Description, int CategoryId);

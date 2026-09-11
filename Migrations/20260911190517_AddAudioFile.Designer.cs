@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SoundEffectLibrary.Data;
@@ -11,9 +12,11 @@ using SoundEffectLibrary.Data;
 namespace SoundEffectLibrary.Migrations
 {
     [DbContext(typeof(SfxDbContext))]
-    partial class SfxDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260911190517_AddAudioFile")]
+    partial class AddAudioFile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
