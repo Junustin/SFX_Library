@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Options;
 using SoundEffectLibrary.Interface;
 
 namespace SoundEffectLibrary.Services
@@ -7,9 +8,9 @@ namespace SoundEffectLibrary.Services
     {
         private readonly AudioUploadOptions _options;
 
-        public AudioFileValidator(AudioUploadOptions options)
+        public AudioFileValidator(IOptions<AudioUploadOptions> options)
         {
-            _options = options;
+            _options = options.Value;
         }
 
         public FileValidationResult Validate(IFormFile file)

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Data;
 using SoundEffectLibrary.Interface;
 using SoundEffectLibrary.Models;
+using SoundEffectLibrary.Services;
 
 namespace SoundEffectLibrary.Controllers
 {
@@ -11,58 +12,21 @@ namespace SoundEffectLibrary.Controllers
     [Route("api/sfx")]
     public class AudioAssetsController : ControllerBase
     {
-        private readonly IAudioFileValidator _fileValidator;
-        public AudioAssetsController(IAudioFileValidator fileValidator) 
-        {
-            _fileValidator = fileValidator;
-        }
+        public AudioAssetsController() { }
         
-
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<AudioAsset>> AddAudio(
             [FromForm]CreateAudioAssetRequest request,
-            SfxDbContext dbContext)
+            CreateAudioAssetService createAudioAssetService,
+            CancellationToken cancellationToken)
         {
-            // Validate file
-            var validateResult = _fileValidator.Validate(request.File);
-            if (!validateResult.IsValid)
-            {
-                // Validation failed
-                return BadRequest(validateResult.ErrorMessage);
-            }
-            
-            var audioAsset = new AudioAsset
-            {
-                Id = Guid.NewGuid(),
-                Title = request.Title,
-                Description = request.Description,
-                CategoryId = request.CategoryId
-            };
+            var createResult = await createAudioAssetService.CreateAudioAssetAsync(request, cancellationToken);
 
-            var audioFile = new AudioFile
-            {
-                Id= Guid.NewGuid(),
-                AssetId = audioAsset.Id,
-                FileName = request.File.FileName,
-                ContentType = request.File.ContentType,
-                FileSize = request.File.Length,
-                // Create storage key
-            };
+            if (!createResult.Success)
+                return BadRequest(createResult.ErrorMessage);
 
-            dbContext.AudioAssets.Add(audioAsset);
-            await dbContext.SaveChangesAsync();
-
-            // Create resonse Dto
-            var responseDto = new CreateAudioAssetResponse
-            (
-                audioAsset.Id,
-                audioAsset.Title,
-                audioAsset.Description,
-                audioAsset.CategoryId
-            );
-
-            return CreatedAtAction(nameof(GetById), new { id = audioAsset.Id }, responseDto);
+            return CreatedAtAction(nameof(GetById), new { id = createResult.AudioAssetId }, createResult.response);
         }
 
         [HttpGet]

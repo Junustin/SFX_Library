@@ -5,4 +5,9 @@
         public long MaxFileSize { get; set; }
         public string[] AllowedContentTypes { get; set; } = [];
     }
+
+    public class AudioStorageOptions
+    {
+        public string RootPath { get; set; } = null!;
+    }
 }
