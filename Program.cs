@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SoundEffectLibrary.Data;
+using SoundEffectLibrary.Interface;
 using SoundEffectLibrary.Models;
+using SoundEffectLibrary.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<SfxDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAudioFileValidator, AudioFileValidator>();
 
 var app = builder.Build();
 

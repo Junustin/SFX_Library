@@ -9,6 +9,7 @@
         public long FileSize { get; set; }
         public string StorageKey { get; set; } = null!;
 
+        // Navigation property
         public AudioAsset AudioAsset { get; set; } = null!;
     }
 }
