@@ -39,24 +39,52 @@ namespace SoundEffectLibrary.Services
                 CategoryId = request.CategoryId
             };
 
-            // Save file to storage
-            var storageKey = await _fileStorage.SaveAsync(request.File.OpenReadStream(), audioAsset.Id, request.File.ContentType, cancellationToken);
-
-            // Create file record
-            var audioFile = new AudioFile
+            // Try creating file
+            string storageKey;
+            try
             {
-                Id = Guid.NewGuid(),
-                AssetId = audioAsset.Id,
-                FileName = request.File.FileName,
-                ContentType = request.File.ContentType,
-                FileSize = request.File.Length,
-                StorageKey = storageKey
-            };
+                // Save file to storage
+                storageKey = await _fileStorage.SaveAsync(request.File.OpenReadStream(), audioAsset.Id, request.File.ContentType, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Create file failed
+                return CreateFailed(ex.Message);
+            }
 
-            // Save to Database
-            _dbContext.AudioAssets.Add(audioAsset);
-            _dbContext.AudioFiles.Add(audioFile);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            // Save record to database
+            try
+            {
+                // Create file record
+                var audioFile = new AudioFile
+                {
+                    Id = Guid.NewGuid(),
+                    AssetId = audioAsset.Id,
+                    FileName = request.File.FileName,
+                    ContentType = request.File.ContentType,
+                    FileSize = request.File.Length,
+                    StorageKey = storageKey
+                };
+
+                // Save to Database
+                _dbContext.AudioAssets.Add(audioAsset);
+                _dbContext.AudioFiles.Add(audioFile);
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+            // Save to database failed
+            catch (Exception ex)
+            {
+                // Try delete already created file
+                if (await _fileStorage.Delete(audioAsset.Id))
+                {
+                    return CreateFailed(ex.Message);
+                }
+                else
+                {
+                    return CreateFailed(ex.Message + "\nDelete file also failed");
+                }
+            } 
 
             // Create resonse Dto
             var responseDto = new CreateAudioAssetResponse

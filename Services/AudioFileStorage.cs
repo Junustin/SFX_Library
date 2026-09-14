@@ -28,7 +28,7 @@ namespace SoundEffectLibrary.Services
             Directory.CreateDirectory(Path.Combine(_root.RootPath, AssetId.ToString()));
 
             // Build storage key
-            string storageKey = Path.Combine(AssetId.ToString(), guid.ToString()+extension);
+            string storageKey = Path.Combine(AssetId.ToString(), guid.ToString() + extension);
 
             // Combine root with storage key for file creation
             string filePath = Path.Combine(_root.RootPath, storageKey);
@@ -48,6 +48,21 @@ namespace SoundEffectLibrary.Services
         public Task<Stream> GetAsync(string storageKey, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> Delete(Guid assetId)
+        {
+            string path = Path.Combine(_root.RootPath, assetId.ToString());
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
