@@ -11,4 +11,6 @@
     }
     public record CreateAudioAssetRequest(string Title, string Description, int CategoryId, IFormFile File);
     public record CreateAudioAssetResponse(Guid Id,string Title, string Description, int CategoryId);
+    public record AudioAssetCardResponse(Guid Id, string Title, CategoryResponse CategoryResponse, string PreviewFileUrl);
+    
 }

@@ -7,4 +7,5 @@
     }
 
     public record CreateCategoryRequest(string CategoryName);
+    public record CategoryResponse(int Id, string CategoryName);
 }

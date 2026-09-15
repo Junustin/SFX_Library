@@ -10,7 +10,7 @@ using SoundEffectLibrary.Services;
 namespace SoundEffectLibrary.Controllers
 {
     [ApiController]
-    [Route("api/sfx")]
+    [Route("api/audioassets")]
     public class AudioAssetsController : ControllerBase
     {
         public AudioAssetsController() { }
@@ -31,7 +31,7 @@ namespace SoundEffectLibrary.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<AudioAsset>>> GetAudioAssets(
+        public async Task<ActionResult<IReadOnlyList<AudioAssetCardResponse>>> GetAudioAssets(
             SfxDbContext dbContext)
         {
             var audioAssets = await dbContext.AudioAssets
@@ -39,7 +39,22 @@ namespace SoundEffectLibrary.Controllers
                 .Include(a => a.Category)
                 .ToListAsync();
 
-            return Ok(audioAssets);
+            var response = new List<AudioAssetCardResponse>();
+
+            foreach (var asset in audioAssets)
+            {
+                response.Add(new AudioAssetCardResponse
+                (
+                    asset.Id,
+                    asset.Title,
+                    new CategoryResponse(
+                        asset.CategoryId,
+                        asset.Category.CategoryName),
+                    $"/api/audioassets/{asset.Id}/preview"
+                ));   
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
@@ -58,8 +73,9 @@ namespace SoundEffectLibrary.Controllers
             return Ok(audioAsset);
         }
 
-        [HttpGet("{id}/files")]
-        public async Task<ActionResult> GetFile(Guid id,
+        [HttpGet("{id}/files")] // For download file
+        public async Task<ActionResult> GetFile(
+            Guid id,
             CancellationToken cancellationToken,
             GetAudioFileService getAudioFileService)
         {
@@ -83,5 +99,32 @@ namespace SoundEffectLibrary.Controllers
                     return BadRequest();
              }
          }
+
+        [HttpGet("{id}/preview")] // Used for preview audio file
+        public async Task<ActionResult> GetCardPreview(
+            Guid id,
+            CancellationToken cancellationToken,
+            GetAudioFileService getAudioFileService)
+        {
+            var result = await getAudioFileService.GetAudioFile(id, cancellationToken);
+
+            if (result.Success)
+                return File(result.Stream!, result.ContentType!);
+
+            if (result.FailureType is null) // Should not happen but just in case.
+                return Problem();
+
+            switch (result.FailureType)
+            {
+                case GetAudioFileFailureType.AssetNotFound:
+                    return NotFound();
+                case GetAudioFileFailureType.FileNotFound:
+                    return Problem();
+                case GetAudioFileFailureType.StorageError:
+                    return Problem();
+                default:
+                    return BadRequest();
+            }
+        }
     }
 }
