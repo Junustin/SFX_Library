@@ -1,4 +1,4 @@
-﻿namespace SoundEffectLibrary.Interface
+﻿namespace SoundEffectLibrary.Api.Interface
 {
     public interface IAudioFileStorage
     {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SoundEffectLibrary.Data;
-using SoundEffectLibrary.Interface;
-using SoundEffectLibrary.Models;
+using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Interface;
+using SoundEffectLibrary.Api.Models;
 
-namespace SoundEffectLibrary.Services
+namespace SoundEffectLibrary.Api.Services
 {
     public class CreateAudioAssetService
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SoundEffectLibrary.Models;
+using SoundEffectLibrary.Api.Models;
 
-namespace SoundEffectLibrary.Data
+namespace SoundEffectLibrary.Api.Data
 {
     public class SfxDbContext : DbContext
     {

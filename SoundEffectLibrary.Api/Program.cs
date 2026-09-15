@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using SoundEffectLibrary.Api.Api.Services;
+using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Interface;
+using SoundEffectLibrary.Api.Models;
 using SoundEffectLibrary.Api.Services;
-using SoundEffectLibrary.Data;
-using SoundEffectLibrary.Interface;
-using SoundEffectLibrary.Models;
-using SoundEffectLibrary.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

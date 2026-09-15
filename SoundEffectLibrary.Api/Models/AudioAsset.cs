@@ -1,4 +1,4 @@
-﻿namespace SoundEffectLibrary.Models
+﻿namespace SoundEffectLibrary.Api.Models
 {
     public class AudioAsset{
         public Guid Id { get; set; }

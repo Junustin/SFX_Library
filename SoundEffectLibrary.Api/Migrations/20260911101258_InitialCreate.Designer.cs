@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SoundEffectLibrary.Data;
+using SoundEffectLibrary.Api.Data;
 
 #nullable disable
 
-namespace SoundEffectLibrary.Migrations
+namespace SoundEffectLibrary.Api.Migrations
 {
     [DbContext(typeof(SfxDbContext))]
     [Migration("20260911101258_InitialCreate")]
@@ -25,7 +25,7 @@ namespace SoundEffectLibrary.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioAsset", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioAsset", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace SoundEffectLibrary.Migrations
                     b.ToTable("audioassets", "assets");
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.Category", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,9 +66,9 @@ namespace SoundEffectLibrary.Migrations
                     b.ToTable("categories", (string)null);
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioAsset", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioAsset", b =>
                 {
-                    b.HasOne("SoundEffectLibrary.Models.Category", null)
+                    b.HasOne("SoundEffectLibrary.Api.Models.Category", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)

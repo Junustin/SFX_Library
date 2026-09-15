@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SoundEffectLibrary.Data;
-using SoundEffectLibrary.Models;
+using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Models;
 
-namespace SoundEffectLibrary.Controllers
+namespace SoundEffectLibrary.Api.Controllers
 {
     [ApiController]
     [Route("api/categories")]

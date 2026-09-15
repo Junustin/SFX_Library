@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using SoundEffectLibrary.Data;
-using SoundEffectLibrary.Interface;
-using SoundEffectLibrary.Models;
-using SoundEffectLibrary.Services;
+using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Interface;
+using SoundEffectLibrary.Api.Models;
+using SoundEffectLibrary.Api.Services;
 
-namespace SoundEffectLibrary.Controllers
+namespace SoundEffectLibrary.Api.Controllers
 {
     [ApiController]
     [Route("api/audioassets")]

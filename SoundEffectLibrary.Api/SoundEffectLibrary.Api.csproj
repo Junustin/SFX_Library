@@ -9,16 +9,16 @@
   <ItemGroup>
     <Compile Remove="Dtos\**" />
     <Compile Remove="Repository\**" />
-    <Compile Remove="SoundEffectLibrary.Api\**" />
+    <Compile Remove="SoundEffectLibrary.Api.Api\**" />
     <Content Remove="Dtos\**" />
     <Content Remove="Repository\**" />
-    <Content Remove="SoundEffectLibrary.Api\**" />
+    <Content Remove="SoundEffectLibrary.Api.Api\**" />
     <EmbeddedResource Remove="Dtos\**" />
     <EmbeddedResource Remove="Repository\**" />
-    <EmbeddedResource Remove="SoundEffectLibrary.Api\**" />
+    <EmbeddedResource Remove="SoundEffectLibrary.Api.Api\**" />
     <None Remove="Dtos\**" />
     <None Remove="Repository\**" />
-    <None Remove="SoundEffectLibrary.Api\**" />
+    <None Remove="SoundEffectLibrary.Api.Api\**" />
   </ItemGroup>
 
   <ItemGroup>

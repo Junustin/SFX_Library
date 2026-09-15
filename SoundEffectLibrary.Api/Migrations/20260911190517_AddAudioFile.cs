@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SoundEffectLibrary.Migrations
+namespace SoundEffectLibrary.Api.Migrations
 {
     /// <inheritdoc />
     public partial class AddAudioFile : Migration

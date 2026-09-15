@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Options;
-using SoundEffectLibrary.Api.Services;
-using SoundEffectLibrary.Interface;
+using SoundEffectLibrary.Api.Api.Services;
+using SoundEffectLibrary.Api.Interface;
 
-namespace SoundEffectLibrary.Services
+namespace SoundEffectLibrary.Api.Services
 {
     public class AudioFileStorage : IAudioFileStorage
     {

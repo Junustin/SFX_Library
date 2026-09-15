@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SoundEffectLibrary.Data;
+using SoundEffectLibrary.Api.Data;
 
 #nullable disable
 
-namespace SoundEffectLibrary.Migrations
+namespace SoundEffectLibrary.Api.Migrations
 {
     [DbContext(typeof(SfxDbContext))]
     [Migration("20260911190517_AddAudioFile")]
@@ -25,7 +25,7 @@ namespace SoundEffectLibrary.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioAsset", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioAsset", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace SoundEffectLibrary.Migrations
                     b.ToTable("audioassets", "assets");
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioFile", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioFile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -80,7 +80,7 @@ namespace SoundEffectLibrary.Migrations
                     b.ToTable("audiofiles", "assets");
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.Category", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -97,9 +97,9 @@ namespace SoundEffectLibrary.Migrations
                     b.ToTable("categories", (string)null);
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioAsset", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioAsset", b =>
                 {
-                    b.HasOne("SoundEffectLibrary.Models.Category", "Category")
+                    b.HasOne("SoundEffectLibrary.Api.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -108,9 +108,9 @@ namespace SoundEffectLibrary.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioFile", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioFile", b =>
                 {
-                    b.HasOne("SoundEffectLibrary.Models.AudioAsset", "AudioAsset")
+                    b.HasOne("SoundEffectLibrary.Api.Models.AudioAsset", "AudioAsset")
                         .WithMany("AudioFiles")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -119,7 +119,7 @@ namespace SoundEffectLibrary.Migrations
                     b.Navigation("AudioAsset");
                 });
 
-            modelBuilder.Entity("SoundEffectLibrary.Models.AudioAsset", b =>
+            modelBuilder.Entity("SoundEffectLibrary.Api.Models.AudioAsset", b =>
                 {
                     b.Navigation("AudioFiles");
                 });
