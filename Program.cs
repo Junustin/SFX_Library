@@ -20,6 +20,7 @@ builder.Services.AddScoped<IAudioFileValidator, AudioFileValidator>();
 builder.Services.AddScoped<IAudioFileStorage, AudioFileStorage>();
 
 builder.Services.AddScoped<CreateAudioAssetService>();
+builder.Services.AddScoped<GetAudioFileService>();
 
 builder.Services.Configure<AudioUploadOptions>(builder.Configuration.GetSection("AudioUpload"));
 builder.Services.Configure<AudioStorageOptions>(builder.Configuration.GetSection("AudioStorage"));

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Data;
@@ -56,5 +57,31 @@ namespace SoundEffectLibrary.Controllers
 
             return Ok(audioAsset);
         }
+
+        [HttpGet("{id}/files")]
+        public async Task<ActionResult> GetFile(Guid id,
+            CancellationToken cancellationToken,
+            GetAudioFileService getAudioFileService)
+        {
+            var result = await getAudioFileService.GetAudioFile(id, cancellationToken);
+
+            if (result.Success)
+                return File(result.Stream!, result.ContentType!, result.FileName!);
+
+             if (result.FailureType is null) // Should not happen but just in case.
+                return Problem();
+
+             switch (result.FailureType)
+             {
+                case GetAudioFileFailureType.AssetNotFound :
+                    return NotFound();
+                case GetAudioFileFailureType.FileNotFound :
+                    return Problem(); 
+                case GetAudioFileFailureType.StorageError :
+                    return Problem();
+                default: 
+                    return BadRequest();
+             }
+         }
     }
 }

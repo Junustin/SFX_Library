@@ -45,9 +45,15 @@ namespace SoundEffectLibrary.Services
             // Return storage key
             return storageKey;
         }
-        public Task<Stream> GetAsync(string storageKey, CancellationToken cancellationToken = default)
+        public async Task<Stream?> GetAsync(string storageKey, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            // Combine root with storage key for file creation
+            string filePath = Path.Combine(_root.RootPath, storageKey);
+
+            if (!File.Exists(filePath))
+                return null; // (STORAGE PROLEM meaning database has record of this file but there are no actual file)
+
+            return File.OpenRead(filePath);
         }
 
         public async Task<bool> Delete(Guid assetId)
