@@ -1,3 +1,3 @@
 <Solution>
-  <Project Path="SoundEffectLibrary.csproj" />
+  <Project Path="SoundEffectLibrary.Api/SoundEffectLibrary.Api.csproj" />
 </Solution>

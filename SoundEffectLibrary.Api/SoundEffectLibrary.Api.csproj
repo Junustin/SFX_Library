@@ -1,10 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Dtos\**" />
+    <Compile Remove="Repository\**" />
+    <Compile Remove="SoundEffectLibrary.Api\**" />
+    <Content Remove="Dtos\**" />
+    <Content Remove="Repository\**" />
+    <Content Remove="SoundEffectLibrary.Api\**" />
+    <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="Repository\**" />
+    <EmbeddedResource Remove="SoundEffectLibrary.Api\**" />
+    <None Remove="Dtos\**" />
+    <None Remove="Repository\**" />
+    <None Remove="SoundEffectLibrary.Api\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
@@ -14,11 +29,6 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.17.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Dtos\" />
-    <Folder Include="Repository\" />
   </ItemGroup>
 
 </Project>
