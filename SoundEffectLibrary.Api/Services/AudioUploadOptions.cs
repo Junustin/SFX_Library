@@ -1,4 +1,4 @@
-﻿namespace SoundEffectLibrary
+﻿namespace SoundEffectLibrary.Api.Services
 {
     public class AudioUploadOptions
     {

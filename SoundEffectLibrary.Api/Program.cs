@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using SoundEffectLibrary;
+using SoundEffectLibrary.Api.Services;
 using SoundEffectLibrary.Data;
 using SoundEffectLibrary.Interface;
 using SoundEffectLibrary.Models;
