@@ -8,6 +8,16 @@ using SoundEffectLibrary.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins("https://localhost:7113")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -26,6 +36,7 @@ builder.Services.Configure<AudioUploadOptions>(builder.Configuration.GetSection(
 builder.Services.Configure<AudioStorageOptions>(builder.Configuration.GetSection("AudioStorage"));
 
 var app = builder.Build();
+app.UseCors("Frontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
