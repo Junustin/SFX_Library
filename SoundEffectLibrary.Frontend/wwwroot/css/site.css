@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+}
+
+:root {
+    --color-background: #141414;
+    --color-surface: #011638;
+    --color-text-primary: #EEF0F2;
+    --color-text-secondary: #BEB0A7;
+    --color-accent: #EEC643;
+    --color-interactive: #0D21A1;
+    --color-border: rgba(190, 176, 167, 0.25);
+}
+
+/*
+    Onyx #141414
+    Tuscan Sun #EEC643
+    Platinum #EEF0F2
+    Silver #BEB0A7
+    Vivid Royal #0D21A1
+    Prussian Blue #011638
+*/
+
+header{
+    margin: 30px;
+}
+
+.sound-card {
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-surface);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.search-bar {
+    border: 1px solid var(--color-border);
+    border-radius: 2px;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+}
+
+.sound-card:hover{
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.sound-list {
+    display: grid;
+    padding: 6px;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+}
+
+.sound-info h3 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    color: var(--color-text-primary);
+}
+
+.sound-info p {
+    margin: 0;
+    color: #BEB0A7;
+    font-size: 14px;
+}
+
+.sound-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.sound-actions button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.play-button {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-accent);
+    color: black;
+}
+
+.download-button {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-interactive);
+    color: white;
+}
