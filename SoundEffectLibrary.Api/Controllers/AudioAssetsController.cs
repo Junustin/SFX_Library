@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
-using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
 using SoundEffectLibrary.Api.Services;
 
-namespace SoundEffectLibrary.Api.Controllers
+namespace SoundEffectLibrary.Api.Controllers                  
 {
     [ApiController]
     [Route("api/audioassets")]
@@ -31,19 +28,41 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<AudioAssetCardResponse>>> GetAudioAssets(
-            SfxDbContext dbContext)
+        public async Task<ActionResult<GetAudioAssetRespose>> GetAudioAssets(
+            SfxDbContext dbContext,
+            [FromQuery] GetAudioAssetRequest request) 
         {
-            var audioAssets = await dbContext.AudioAssets
+            IQueryable<AudioAsset> audioAssets = dbContext.AudioAssets
                 .AsNoTracking()
-                .Include(a => a.Category)
-                .ToListAsync();
+                .Include(a => a.Category);
 
-            var response = new List<AudioAssetCardResponse>();
-
-            foreach (var asset in audioAssets)
+            if (!string.IsNullOrWhiteSpace(request.Search))
             {
-                response.Add(new AudioAssetCardResponse
+                audioAssets = audioAssets.Where(a => 
+                    EF.Functions.ILike(a.Title, $"%{request.Search}%") 
+                    || EF.Functions.ILike(a.Category.CategoryName, $"%{request.Search}%"));
+            }
+
+            audioAssets = audioAssets
+                   .OrderBy(a => a.Category.CategoryName)
+                   .ThenBy(a => a.Title)
+                   .ThenBy(a => a.Id);
+
+            var totalCount = await audioAssets.CountAsync();
+
+            var skip = (request.Page - 1) * request.PageSize;
+           
+            var filteredAssets = await audioAssets
+                    .Skip(skip)
+                    .Take(request.PageSize)
+                    .ToListAsync();
+
+            
+            var items = new List<AudioAssetCardResponse>();
+
+            foreach (var asset in filteredAssets)
+            {
+                items.Add(new AudioAssetCardResponse
                 (
                     asset.Id,
                     asset.Title,
@@ -51,8 +70,9 @@ namespace SoundEffectLibrary.Api.Controllers
                         asset.CategoryId,
                         asset.Category.CategoryName),
                     $"/api/audioassets/{asset.Id}/preview"
-                ));   
+                ));
             }
+            var response = new GetAudioAssetRespose(items, request.Page, request.PageSize, totalCount);
 
             return Ok(response);
         }

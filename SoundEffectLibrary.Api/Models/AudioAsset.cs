@@ -1,4 +1,6 @@
-﻿namespace SoundEffectLibrary.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SoundEffectLibrary.Api.Models
 {
     public class AudioAsset{
         public Guid Id { get; set; }
@@ -12,5 +14,7 @@
     public record CreateAudioAssetRequest(string Title, string Description, int CategoryId, IFormFile File);
     public record CreateAudioAssetResponse(Guid Id,string Title, string Description, int CategoryId);
     public record AudioAssetCardResponse(Guid Id, string Title, CategoryResponse CategoryResponse, string PreviewFileUrl);
+    public record GetAudioAssetRequest(string? Search, [Range(1, int.MaxValue)] int Page ,[Range(1, 100)] int PageSize);
+    public record GetAudioAssetRespose(List<AudioAssetCardResponse> Items, int Page, int PageSize, int TotalCount);
     
 }

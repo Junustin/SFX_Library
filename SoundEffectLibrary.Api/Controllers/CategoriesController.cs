@@ -14,8 +14,11 @@ namespace SoundEffectLibrary.Api.Controllers
             CreateCategoryRequest request, 
             SfxDbContext dbContext)
         {
+            if (string.IsNullOrWhiteSpace(request.CategoryName))
+                return BadRequest("Category name must not be null.");
             var category = new Category
             {
+                
                 CategoryName = request.CategoryName
             };
 
