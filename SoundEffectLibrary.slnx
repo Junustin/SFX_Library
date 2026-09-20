@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="SoundEffectLibrary.Api.Tests/SoundEffectLibrary.Api.Tests.csproj" Id="430e11e1-6c85-4269-a6af-c21195ddcf01">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
   <Project Path="SoundEffectLibrary.Api/SoundEffectLibrary.Api.csproj" />
   <Project Path="SoundEffectLibrary.Frontend/SoundEffectLibrary.Frontend.csproj" Id="c3beeb97-bd0a-431d-9716-03a5842d64cd" />
 </Solution>
