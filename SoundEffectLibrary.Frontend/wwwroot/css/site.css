@@ -96,3 +96,29 @@ header{
     background-color: var(--color-interactive);
     color: white;
 }
+
+
+[hidden] {
+    display: none !important;
+}
+.sound-header {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#loading-message {
+    align-items: center;
+}
+
+#error-message{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.tryagain-button{
+    width: 80px;
+    height: 20px;
+}
+

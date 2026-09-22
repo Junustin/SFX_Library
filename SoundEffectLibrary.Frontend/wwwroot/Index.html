@@ -18,13 +18,34 @@
 
         <section class="search-section">
             <h2>Search</h2>
-            <input class="search-bar" type="text" placeholder="Search sound effects">
+            <div>
+                <input class="search-bar" type="text" placeholder="Search sound effects">
+                <button class="search-button">Search</button>
+            </div>
         </section>
 
         <section>
-            <h2>Sound Effects</h2>
+            <div class="sound-header">
+                <h2>Sound Effects</h2>
 
+                <div hidden id="loading-message">
+                    <h4>Loading...</h4>
+                </div>
+
+                <div hidden id="error-message">
+
+                    <h3 class="error-text">Error </h3>
+                    <button class="tryagain-button">Try again?</button>
+                </div>
+            </div>
+    
             <div class="sound-list">
+                <!--App create sound card and will put in this list.-->
+            </div>
+        </section>
+
+        <section>
+            <div class="pagination-button">
 
             </div>
         </section>
