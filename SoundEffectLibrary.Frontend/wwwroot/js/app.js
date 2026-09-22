@@ -1,13 +1,62 @@
 const soundList = document.querySelector(".sound-list");
+const paginationButton = document.querySelector(".pagination-button");
+const searchBar = document.querySelector(".search-bar");
+const searchButton = document.querySelector(".search-button");
+
+const loadingMessage = document.getElementById("loading-message");
+const errorMessage = document.getElementById("error-message");
+const errorText = document.querySelector(".error-text");
+const tryagainButton = document.querySelector(".tryagain-button")
+
+// Audio player
 let currentAudio = null;
 let currentButton = null;
 let currentProgressBar = null;
 let currentTimeDisplay = null;
+let audio = null;
 
-fetch("https://localhost:7096/api/audioassets")
-    .then(response => response.json())
-    .then(data => {
-        data.forEach(asset => {
+// Pagination
+let currentPage = 1;
+let pageSize = 3;
+let pageCount = 1;
+
+// Search
+let currentSearchString = "";
+
+// Loading/Error
+
+
+loadAssets(1, currentSearchString);
+
+
+searchButton.addEventListener(`click`, () => {
+    startSearch();
+});
+
+tryagainButton.addEventListener(`click`, () => {
+    loadAssets(currentPage, currentSearchString);
+});
+
+async function loadAssets(page, search) {
+    try {
+        loadingMessage.hidden = false;
+        errorMessage.hidden = true;
+
+        const response = await fetch(`https://localhost:7096/api/audioassets?Search=${search}&Page=${currentPage}&PageSize=${pageSize}`);
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`)
+        }
+
+        const data = await response.json();
+
+        soundList.innerHTML = "";
+        paginationButton.innerHTML = "";
+
+        if (currentAudio != null)
+            currentAudio.pause();
+
+        // Create each card
+        data.items.forEach(asset => {
 
             const card = document.createElement("article");
 
@@ -42,9 +91,9 @@ fetch("https://localhost:7096/api/audioassets")
 
             progressBar.addEventListener("input", () => {
                 if (audio !== null && audio.duration) {
-                        audio.currentTime =
+                    audio.currentTime =
                         (progressBar.value / 100) * audio.duration;
-                 }
+                }
             });
 
             playButton.addEventListener("click", () => {
@@ -141,9 +190,68 @@ fetch("https://localhost:7096/api/audioassets")
 
             });
 
-            soundList.appendChild(card);  
+            soundList.appendChild(card);
         });
-    });
+
+        pageCount = calculatePage(data.totalCount);
+
+        // Create page controller button
+        paginationButton.innerHTML = `
+                    <div class="pagination">
+                        <button ${currentPage === 1 ? "disabled" : ""} class="previous-button">Previous</button>
+
+                        <span class="page-info">Page ${currentPage} of ${pageCount}</span>
+
+                        <button ${currentPage === pageCount ? "disabled" : ""} class="next-button">Next</button>
+                    </div>
+    `;
+
+        const nextButton = paginationButton.querySelector(".next-button");
+        const previousButton = paginationButton.querySelector(".previous-button");
+
+        nextButton.addEventListener(`click`, () => {
+            nextPage();
+        });
+        previousButton.addEventListener(`click`, () => {
+            previousPage();
+        });
+    }
+    catch (ex) {
+        console.log("Error");
+        loadingMessage.hidden = true;
+        errorMessage.hidden = false;
+        errorText.textContent = ex.message;
+        console.log(ex);
+    }
+    finally {
+        loadingMessage.hidden = true;
+    }
+}
+
+function startSearch() {
+    currentPage = 1;
+
+    // Update search string
+    currentSearchString = searchBar.value;
+
+    loadAssets(1, currentSearchString);
+}
+function nextPage() {
+    if (currentPage + 1 <= pageCount) {
+        currentPage += 1;
+        loadAssets(currentPage, currentSearchString);
+    }
+}
+function previousPage() {
+    if (currentPage > 1) {
+        currentPage -= 1;
+        loadAssets(currentPage, currentSearchString);
+    }
+}
+function calculatePage(totalCount) {
+    pageCount = Math.ceil(totalCount / pageSize);
+    return pageCount;
+}
 function formatTime(seconds) {
     if (!Number.isFinite(seconds)) {
         return "0:00";
