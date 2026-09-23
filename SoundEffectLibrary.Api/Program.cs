@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -26,10 +28,32 @@ builder.Services.AddControllers();
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        ProblemDetailsFactory problemFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
 
+        string detail = "Too many request.";
+
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            var seconds = (int)Math.Ceiling(retryAfter.TotalSeconds);
+            context.HttpContext.Response.Headers.RetryAfter = $"{seconds}";
+
+            detail = $"Too many request. Try again after {seconds} seconds.";
+        }
+
+        ProblemDetails problemDetails = problemFactory.CreateProblemDetails(
+                    context.HttpContext,
+                    StatusCodes.Status429TooManyRequests,
+                    detail
+                );
+
+        await context.HttpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+    };
+ 
     options.AddFixedWindowLimiter(policyName: "fixed", cfg =>
     {
-
         cfg.PermitLimit = 5;
         cfg.Window = TimeSpan.FromSeconds(10);
     });
