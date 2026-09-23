@@ -284,9 +284,12 @@ namespace SoundEffectLibrary.Api.Tests
             }
 
             var response = await client.GetAsync("/api/audioassets?page=1&pageSize=2");
+            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
 
             // Assert
             Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
+            Assert.Equal(429, problem!.Status);
+            Assert.True(response.Headers.Contains("Retry-After"));
         }
     }
 }
