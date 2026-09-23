@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
 using SoundEffectLibrary.Api.Models;
 using System.Net;
 using System.Net.Http.Json;
@@ -215,6 +216,56 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetAudioAssets_NoExistId_ReturnNotFoundRequest()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/audioassets/cd746347-a4f2-45aa-9975-8b4c9bf9e719");
+            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
+            Assert.Equal(404, problem!.Status);
+            Assert.Equal("The requested audio asset was not found.", problem.Detail);
+        }
+
+        [Fact]
+        public async Task GetAudioAssets_InvalidId_ReturnBadRequest()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/audioassets/not-a-guid");
+            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            var errors = problem!.Extensions["errors"];
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
+            Assert.Contains("The value 'not-a-guid' is not valid.", errors!.ToString());
+        }
+
+        [Fact]
+        public async Task GetError_TestError_ReturnServerError()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/audioassets/test-error");
+            var body = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
+            Assert.DoesNotContain("This should never be exposed to the client.", body);
         }
     }
 }
