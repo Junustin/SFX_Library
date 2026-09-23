@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SoundEffectLibrary.Api.Api.Services;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Services;
+using System.Diagnostics;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,42 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter(policyName: "fixed", cfg =>
+    {
+
+        cfg.PermitLimit = 5;
+        cfg.Window = TimeSpan.FromSeconds(10);
+    });
+
+    options.AddPolicy("per-IP", httpContext =>
+    {
+        string? ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        if (!string.Equals(ipAddress, "unknown"))
+        {
+            return RateLimitPartition.GetTokenBucketLimiter(ipAddress,
+            _ => new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 5,
+                TokensPerPeriod = 2,
+                ReplenishmentPeriod = TimeSpan.FromSeconds(10)
+            });
+        }
+
+        return RateLimitPartition.GetFixedWindowLimiter("unknown",
+            _ => new FixedWindowRateLimiterOptions
+        {
+                PermitLimit = 5,
+                Window = TimeSpan.FromSeconds(30),
+        });
+    });
+});
+
 builder.Services.AddProblemDetails(o =>
 {
     o.CustomizeProblemDetails = context =>
@@ -59,6 +98,10 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseRouting();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

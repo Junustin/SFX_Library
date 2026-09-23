@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Models;
@@ -8,6 +9,7 @@ namespace SoundEffectLibrary.Api.Controllers
 {
     [ApiController]
     [Route("api/audioassets")]
+    [EnableRateLimiting("per-IP")]
     public class AudioAssetsController : ControllerBase
     {
         public AudioAssetsController() { }
@@ -28,6 +30,7 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpGet]
+        [EnableRateLimiting("per-IP")]
         public async Task<ActionResult<GetAudioAssetRespose>> GetAudioAssets(
             SfxDbContext dbContext,
             [FromQuery] GetAudioAssetRequest request) 
@@ -78,6 +81,7 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [EnableRateLimiting("fixed")]
         public async Task<ActionResult<AudioAsset>> GetById(
             Guid id,
             SfxDbContext dbContext)
@@ -153,6 +157,7 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpGet("test-error")]
+        [DisableRateLimiting]
         public IActionResult TestError()
         {
             throw new Exception("This should never be exposed to the client.");
