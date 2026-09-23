@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Models;
-using System.Data.Common;
 
 namespace SoundEffectLibrary.Api.Tests
 {
@@ -18,15 +17,10 @@ namespace SoundEffectLibrary.Api.Tests
         }
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-
             // Replace original database with test container database
             builder.ConfigureServices(services =>
             {
                 services.RemoveAll<SfxDbContext>();
-
-                var dbConnectionDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType ==
-                        typeof(DbConnection));
 
                 services.AddDbContext<SfxDbContext>(options =>
                     options.UseNpgsql(_database.ConnectionString));

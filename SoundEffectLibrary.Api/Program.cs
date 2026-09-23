@@ -34,13 +34,14 @@ builder.Services.AddRateLimiter(options =>
         cfg.Window = TimeSpan.FromSeconds(10);
     });
 
-    options.AddPolicy("per-IP", httpContext =>
+    options.AddPolicy("per-ip", httpContext =>
     {
         string? ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
         if (!string.Equals(ipAddress, "unknown"))
         {
-            return RateLimitPartition.GetTokenBucketLimiter(ipAddress,
+            return RateLimitPartition.GetTokenBucketLimiter(
+                ipAddress,
             _ => new TokenBucketRateLimiterOptions
             {
                 TokenLimit = 5,
@@ -97,9 +98,9 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.UseRouting();
+
+app.UseAuthorization();
 
 app.UseRateLimiter();
 

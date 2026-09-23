@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Http.Features;
 using SoundEffectLibrary.Api.Models;
 using System.Net;
 using System.Net.Http.Json;
 using Xunit.Abstractions;
+using Org.BouncyCastle.Tls;
 
 namespace SoundEffectLibrary.Api.Tests
 {
@@ -266,6 +268,25 @@ namespace SoundEffectLibrary.Api.Tests
             Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
             Assert.DoesNotContain("This should never be exposed to the client.", body);
+        }
+
+        [Fact]
+        public async Task GetAudioAssets_ExceedRateLimit_ReturnTooManyRequests()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            for (int i = 0; i < 5; i++)
+            {
+                var r = await client.GetAsync("/api/audioassets?page=1&pageSize=2");
+                Assert.Equal(HttpStatusCode.OK, r.StatusCode);
+            }
+
+            var response = await client.GetAsync("/api/audioassets?page=1&pageSize=2");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
         }
     }
 }

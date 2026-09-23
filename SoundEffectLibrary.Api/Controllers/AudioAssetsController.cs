@@ -9,7 +9,7 @@ namespace SoundEffectLibrary.Api.Controllers
 {
     [ApiController]
     [Route("api/audioassets")]
-    [EnableRateLimiting("per-IP")]
+    [EnableRateLimiting("per-ip")]
     public class AudioAssetsController : ControllerBase
     {
         public AudioAssetsController() { }
@@ -30,7 +30,7 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpGet]
-        [EnableRateLimiting("per-IP")]
+        [EnableRateLimiting("per-ip")]
         public async Task<ActionResult<GetAudioAssetRespose>> GetAudioAssets(
             SfxDbContext dbContext,
             [FromQuery] GetAudioAssetRequest request) 
