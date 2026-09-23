@@ -3,7 +3,6 @@ using Scalar.AspNetCore;
 using SoundEffectLibrary.Api.Api.Services;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Interface;
-using SoundEffectLibrary.Api.Models;
 using SoundEffectLibrary.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +19,16 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails(o =>
+{
+    o.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance = 
+            $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+        
+        context.ProblemDetails.Extensions.TryAdd("traceId", context.HttpContext.TraceIdentifier);
+    };
+});
 
 builder.Services.AddOpenApi();
 
@@ -44,6 +53,8 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
     app.MapOpenApi();
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
