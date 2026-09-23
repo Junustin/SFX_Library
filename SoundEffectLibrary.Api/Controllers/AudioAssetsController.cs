@@ -88,7 +88,12 @@ namespace SoundEffectLibrary.Api.Controllers
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (audioAsset == null)
-                return NotFound($"No audio asset with this ID:{id} found.");
+            {
+                return Problem(
+                    title: "Asset not found",
+                    detail: "The requested audio asset was not found.",
+                    statusCode: 404);
+            }
 
             return Ok(audioAsset);
         }
@@ -145,6 +150,12 @@ namespace SoundEffectLibrary.Api.Controllers
                 default:
                     return BadRequest();
             }
+        }
+
+        [HttpGet("test-error")]
+        public IActionResult TestError()
+        {
+            throw new Exception("This should never be exposed to the client.");
         }
     }
 }
