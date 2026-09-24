@@ -1,20 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.Http.Features;
 using SoundEffectLibrary.Api.Models;
 using System.Net;
 using System.Net.Http.Json;
 using Xunit.Abstractions;
-using Org.BouncyCastle.Tls;
 
 namespace SoundEffectLibrary.Api.Tests
 {
-    public class AudioAssetsEndpointTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestDatabaseFixture>, IAsyncLifetime
+    public class GetAudioAssetsEndpointTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestDatabaseFixture>, IAsyncLifetime
     {
         private readonly CustomWebApplicationFactory _factory;
         private readonly ITestOutputHelper _output;
 
-        public AudioAssetsEndpointTests(TestDatabaseFixture database, ITestOutputHelper output)
+        public GetAudioAssetsEndpointTests(TestDatabaseFixture database, ITestOutputHelper output)
         {
             _factory = new CustomWebApplicationFactory(database);
             _output = output;
@@ -27,7 +25,6 @@ namespace SoundEffectLibrary.Api.Tests
         {
             _factory.Dispose();
             return Task.CompletedTask;
-
         }
 
         [Fact]
@@ -196,7 +193,6 @@ namespace SoundEffectLibrary.Api.Tests
         public async Task GetAudioAssets_InvalidPageValue_ReturnsBadRequest()
         {
             // Arrange
-
             var client = _factory.CreateClient();
 
             // Act
@@ -210,7 +206,6 @@ namespace SoundEffectLibrary.Api.Tests
         public async Task GetAudioAssets_InvalidPageSizeValue_ReturnBadRequest()
         {
             // Arrange
-
             var client = _factory.CreateClient();
 
             // Act
@@ -218,40 +213,6 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GetAudioAssets_NoExistId_ReturnNotFoundRequest()
-        {
-            // Arrange
-            var client = _factory.CreateClient();
-
-            // Act
-            var response = await client.GetAsync("/api/audioassets/cd746347-a4f2-45aa-9975-8b4c9bf9e719");
-            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-
-            // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
-            Assert.Equal(404, problem!.Status);
-            Assert.Equal("The requested audio asset was not found.", problem.Detail);
-        }
-
-        [Fact]
-        public async Task GetAudioAssets_InvalidId_ReturnBadRequest()
-        {
-            // Arrange
-            var client = _factory.CreateClient();
-
-            // Act
-            var response = await client.GetAsync("/api/audioassets/not-a-guid");
-            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            var errors = problem!.Extensions["errors"];
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
-            Assert.Contains("The value 'not-a-guid' is not valid.", errors!.ToString());
         }
 
         [Fact]

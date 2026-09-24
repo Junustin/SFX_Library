@@ -5,18 +5,33 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace SoundEffectLibrary.Api.Tests
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         private readonly TestDatabaseFixture _database;
+        public string TestStoragePath { get; }
         public CustomWebApplicationFactory(TestDatabaseFixture database)
         {
             _database = database;
+
+            TestStoragePath = Path.Combine(
+                    Path.GetTempPath(),
+                    "SoundEffectLibraryTests",
+                    Guid.NewGuid().ToString());
         }
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["AudioStorage:RootPath"] = TestStoragePath
+                });
+            });
+
             // Replace original database with test container database
             builder.ConfigureServices(services =>
             {
@@ -127,6 +142,16 @@ namespace SoundEffectLibrary.Api.Tests
             dbContext.Categories.RemoveRange(dbContext.Categories);
 
             await dbContext.SaveChangesAsync();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (Directory.Exists(TestStoragePath))
+            {
+                Directory.Delete(TestStoragePath, true);
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
