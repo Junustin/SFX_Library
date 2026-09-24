@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using SoundEffectLibrary.Api.Api.Services;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Services;
-using System.Diagnostics;
+using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -94,6 +95,22 @@ builder.Services.AddProblemDetails(o =>
     };
 });
 
+builder.Services
+    .AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        var signingKey = builder.Configuration["Jwt:SigningKey"];
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey!));
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = symmetricKey,
+            ValidateLifetime = true,
+        };
+    });
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<SfxDbContext>(options =>
@@ -124,6 +141,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRateLimiter();

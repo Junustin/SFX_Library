@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
@@ -15,6 +16,7 @@ namespace SoundEffectLibrary.Api.Controllers
         public AudioAssetsController() { }
         
         [HttpPost]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<AudioAsset>> AddAudio(
             [FromForm]CreateAudioAssetRequest request,
