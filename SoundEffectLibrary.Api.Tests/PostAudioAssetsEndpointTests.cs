@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -45,15 +48,49 @@ namespace SoundEffectLibrary.Api.Tests
         }
 
         [Fact]
-        public async Task PostAudioAssets_Authenticated_ReturnCreated()
+        public async Task PostAudioAssets_AuthenticateWithoutRole_ReturnForbidden()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            var token = CreateTestToken();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Act
+            var response = await client.PostAsync("/api/audioassets", null);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task PostAudioAssets_AuthenticateWithRole_PassAuthorization()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            var token = CreateTestToken("AssetManager");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Act
+            var response = await client.PostAsync("/api/audioassets", null);
+
+            // Assert
+            // BadRequest is expected because this test only verifies that
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode); 
+        }
+
+        [Fact]
+        public async Task PostAudioAssets_ContentAttach_ReturnCreated()
         {
             // Arrange
             await _factory.ResetDatabaseAsync();
             await _factory.SeedDataAsync();
 
             var client = _factory.CreateClient();
-            var token = CreateTestToken();
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var token = CreateTestToken("AssetManager");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+           
 
             var tempFilePath = Path.Combine(
                 Path.GetTempPath(),
@@ -91,6 +128,35 @@ namespace SoundEffectLibrary.Api.Tests
 
                 // Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+                // Check response content is correct
+                var createdResponse = await response.Content.ReadFromJsonAsync<CreateAudioAssetResponse>();
+                Assert.NotNull(createdResponse);
+                Assert.NotEqual(Guid.Empty, createdResponse.Id);
+
+                AudioAsset? audioAssets = 
+                    await dbContext.AudioAssets
+                    .AsNoTracking()
+                    .Where(a => a.Id == createdResponse!.Id)
+                    .Include(a => a.AudioFiles)
+                    .Include(a => a.Category)
+                    .SingleOrDefaultAsync();
+
+                // Assets record get created
+                Assert.NotNull(audioAssets);
+
+                AudioFile audioFile = audioAssets.AudioFiles.Single();
+                // Assets contain file
+                Assert.Single(audioAssets.AudioFiles);
+                // Database has file record
+                Assert.Equal("test.wav", audioFile.FileName);
+
+                Assert.NotNull(audioAssets.Category);
+                Assert.Equal("FootStep", audioAssets.Category.CategoryName);
+
+                var filePath = Path.Combine(_factory.TestStoragePath, audioFile.StorageKey);
+                var extension = Path.GetExtension(filePath);
+                Assert.True(File.Exists(filePath) && extension == ".wav");       
             }
             finally
             {
@@ -102,16 +168,25 @@ namespace SoundEffectLibrary.Api.Tests
             }  
         }
 
-        private string CreateTestToken()
+        private string CreateTestToken(string role = "")
         {
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes("this-is-my-secret-signingkey-for-using-in-development-it-is-not-the-real-key-so-dont-worry-about-it"));
 
             var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, "user-123"));
+
+            if (!string.IsNullOrWhiteSpace(role))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var token = new JwtSecurityToken(
                 issuer: "library-auth",
                 audience: "library-api",
+                claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(5),
                 signingCredentials: credential
                 );
@@ -120,5 +195,6 @@ namespace SoundEffectLibrary.Api.Tests
 
             return handler.WriteToken(token);
         }
+
     }
 }
