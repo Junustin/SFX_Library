@@ -57,6 +57,17 @@ namespace SoundEffectLibrary.Api.Services
             return File.OpenRead(filePath);
         }
 
+        public bool IsAudioFileExist(string storageKey)
+        {
+            //Combine root with storage key for file creation
+            string filePath = Path.Combine(_root.RootPath, storageKey);
+
+            if (!File.Exists(filePath))
+                    return false;
+
+            return true;
+        }
+
         public async Task<bool> Delete(Guid assetId)
         {
             string path = Path.Combine(_root.RootPath, assetId.ToString());

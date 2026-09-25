@@ -6,6 +6,8 @@
 
         Task<Stream?> GetAsync(string storageKey, CancellationToken cancellationToken = default);
 
+        bool IsAudioFileExist(string storageKey);
+
         Task<bool> Delete(Guid assetId);
         
     }

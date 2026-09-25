@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Models;
 using SoundEffectLibrary.Api.Services;
+using System.Security.Claims;
 
 namespace SoundEffectLibrary.Api.Controllers                  
 {
@@ -16,7 +18,7 @@ namespace SoundEffectLibrary.Api.Controllers
         public AudioAssetsController() { }
         
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "AssetManager")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<AudioAsset>> AddAudio(
             [FromForm]CreateAudioAssetRequest request,
@@ -158,10 +160,44 @@ namespace SoundEffectLibrary.Api.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        [EnableRateLimiting("per-ip")]
+        public async Task<ActionResult<AudioAsset>> DeleteAsset(
+            Guid id,
+            DeleteAudioAssetService deleteAudioAssetService,
+            CancellationToken cancellationToken)
+        {
+            var deleteResult = await deleteAudioAssetService.DeleteAudioAssetAsync(id, cancellationToken);
+
+            if (deleteResult.Success)
+                return NoContent();
+
+            switch (deleteResult.FailureType)
+            {
+                case DeleteAssetFailureType.AssetNotFound:
+                    return NotFound();
+                case DeleteAssetFailureType.FileNotFound:
+                    return Problem(
+                        detail: "File not found."
+                        );
+                case DeleteAssetFailureType.DeleteRecordFailed:
+                    return Problem(
+                        detail: "Delete record failed."
+                        );
+                case DeleteAssetFailureType.DeleteFileFailed:
+                    return Problem(
+                        detail: "Delete file failed."
+                        );
+                default:
+                    return BadRequest();
+            }
+        }
+
         [HttpGet("test-error")]
         [DisableRateLimiting]
         public IActionResult TestError()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             throw new Exception("This should never be exposed to the client.");
         }
     }
