@@ -37,10 +37,22 @@ namespace SoundEffectLibrary.Api.Services
             // Create physical file
             var createdFile = File.Create(filePath);
 
-            // Copy bytes from input stream
-            using (createdFile)
+            try
             {
-                await stream.CopyToAsync(createdFile, cancellationToken);
+                // Copy bytes from input stream
+                using (createdFile)
+                {
+                    await stream.CopyToAsync(createdFile, cancellationToken);
+                }
+            }
+            catch
+            {
+                // If copy file failed delete that partial file
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath); 
+                }
+                throw;
             }
             
             // Return storage key
