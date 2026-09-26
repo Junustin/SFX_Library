@@ -28,8 +28,17 @@ namespace SoundEffectLibrary.Api.Services
 
             if (asset is null)
                 return DeleteFailed($"Asset with ID:{assetId} not found.", DeleteAssetFailureType.AssetNotFound);
-            
+
             // Get storage key
+            List<AudioFile> files = await _dbContext.AudioFiles
+                .AsNoTracking()
+                .Where(f => f.AssetId == assetId).ToListAsync();
+
+            if (files.Count() <= 0)
+            {
+                return DeleteFailed($"Asset with ID:{assetId} has not file.", DeleteAssetFailureType.FileNotFound);
+            }
+
             string storageKey = asset!.AudioFiles.Single().StorageKey;
             if(storageKey is null || !_fileStorage.IsAudioFileExist(storageKey))
                 return DeleteFailed($"No storage key found.", DeleteAssetFailureType.FileNotFound);
@@ -60,7 +69,11 @@ namespace SoundEffectLibrary.Api.Services
             catch (Exception ex)
             {
                 // Delete file failed
-                return DeleteFailed(ex.Message, DeleteAssetFailureType.DeleteFileFailed);
+                return DeleteFailed(
+                    "Delete file failed with message:\n"
+                    + ex.Message
+                    + $"\nThere will be file left in the storage with name: {files[0].Id.ToString()}.",
+                    DeleteAssetFailureType.DeleteFileFailed);
             }
 
             // Create resonse Dto
