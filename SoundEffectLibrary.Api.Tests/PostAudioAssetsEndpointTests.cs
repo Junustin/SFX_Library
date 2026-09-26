@@ -81,7 +81,7 @@ namespace SoundEffectLibrary.Api.Tests
         }
 
         [Fact]
-        public async Task PostAudioAssets_ContentAttach_ReturnCreated()
+        public async Task PostAudioAssets_WavHeaderFile_ReturnCreated()
         {
             // Arrange
             await _factory.ResetDatabaseAsync();
@@ -98,7 +98,12 @@ namespace SoundEffectLibrary.Api.Tests
             try
             {
                 // Write file into temp path
-                await File.WriteAllBytesAsync(tempFilePath, new byte[] { 1, 2, 3, 4, 5, 6 });
+                await File.WriteAllBytesAsync(tempFilePath, new byte[]
+                    {
+                        0x52, 0x49, 0x46, 0x46, // RIFF
+                        0x00, 0x00, 0x00, 0x00, // file size placeholder
+                        0x57, 0x41, 0x56, 0x45  // WAVE
+                    });
 
                 // Get stream from created file
                 using var fileStream = File.OpenRead(tempFilePath);
@@ -168,6 +173,365 @@ namespace SoundEffectLibrary.Api.Tests
             }  
         }
 
+        [Fact]
+        public async Task PostAudioAssets_NotWavHeader_ReturnBadRequest()
+        {
+            // Arrange
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+            var tempFilePath = Path.Combine(
+                Path.GetTempPath(),
+                $"{Guid.NewGuid()}.wav");
+            try
+            {
+                // Write file into temp path
+                await File.WriteAllBytesAsync(tempFilePath, new byte[] { 1, 2, 3, 4, 5, 6 });
+
+                // Get stream from created file
+                using var fileStream = File.OpenRead(tempFilePath);
+                // Turn stream into content
+                using var fileContent = new StreamContent(fileStream);
+                // Create multiform 
+                using var content = new MultipartFormDataContent();
+                // Set content headers
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
+
+                // Get dbContext
+                using var scope = _factory.Services.CreateScope();
+                var dbContext = scope.ServiceProvider
+                    .GetRequiredService<SfxDbContext>();
+
+                int categoryId = await dbContext.Categories
+                    .Where(c => c.CategoryName == "FootStep")
+                    .Select(c => c.Id)
+                    .SingleAsync();
+
+                content.Add(new StringContent("Test Audio"), "Title");
+                content.Add(new StringContent("Test Description"), "Description");
+                content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+                content.Add(fileContent, "File", "test.wav");
+                // Act
+                var response = await client.PostAsync("/api/audioassets", content);
+
+                // Assert
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            }
+            finally
+            {
+                // Clean up
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+            }
+        }
+        [Fact]
+        public async Task PostAudioAssets_ValidMp3File_ReturnCreated()
+        {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            // Arrange
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var mp3Bytes = new byte[]
+            {
+                0xFF, 0xFB
+            };
+
+            // Get dbContext
+            using var scope = _factory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<SfxDbContext>();
+
+            int categoryId = await dbContext.Categories
+                .Where(c => c.CategoryName == "FootStep")
+                .Select(c => c.Id)
+                .SingleAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(mp3Bytes);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue("audio/mpeg");
+
+            content.Add(fileContent, "File", "test.mp3");
+            content.Add(new StringContent("Test MP3"), "Title");
+            content.Add(new StringContent("Test MP3 description"), "Description");
+            content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/audioassets",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+        [Fact]
+        public async Task PostAudioAssets_InvalidMp3Signature_ReturnBadRequest()
+        {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            // Arrange
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var mp3Bytes = new byte[]
+            {
+                0x00, 0x00
+            };
+
+            // Get dbContext
+            using var scope = _factory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<SfxDbContext>();
+
+            int categoryId = await dbContext.Categories
+                .Where(c => c.CategoryName == "FootStep")
+                .Select(c => c.Id)
+                .SingleAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(mp3Bytes);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue("audio/mpeg");
+
+            content.Add(fileContent, "File", "test.mp3");
+            content.Add(new StringContent("Test MP3"), "Title");
+            content.Add(new StringContent("Test MP3 description"), "Description");
+            content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/audioassets",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        [Fact]
+        public async Task PostAudioAssets_Mp3WithReservedVersion_ReturnBadRequest()
+        {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            // Arrange
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var mp3Bytes = new byte[]
+            {
+                0xFF, 0xEB
+            };
+
+            // Get dbContext
+            using var scope = _factory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<SfxDbContext>();
+
+            int categoryId = await dbContext.Categories
+                .Where(c => c.CategoryName == "FootStep")
+                .Select(c => c.Id)
+                .SingleAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(mp3Bytes);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue("audio/mpeg");
+
+            content.Add(fileContent, "File", "test.mp3");
+            content.Add(new StringContent("Test MP3"), "Title");
+            content.Add(new StringContent("Test MP3 description"), "Description");
+            content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/audioassets",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        [Fact]
+        public async Task PostAudioAssets_Mp3WithReservedLayer_ReturnBadRequest()
+        {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            // Arrange
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var mp3Bytes = new byte[]
+            {
+                0xFF, 0xE1
+            };
+
+            // Get dbContext
+            using var scope = _factory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<SfxDbContext>();
+
+            int categoryId = await dbContext.Categories
+                .Where(c => c.CategoryName == "FootStep")
+                .Select(c => c.Id)
+                .SingleAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(mp3Bytes);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue("audio/mpeg");
+
+            content.Add(fileContent, "File", "test.mp3");
+            content.Add(new StringContent("Test MP3"), "Title");
+            content.Add(new StringContent("Test MP3 description"), "Description");
+            content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/audioassets",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        [Fact]
+        public async Task PostAudioAssets_Mp3WithId3v2Tag_ReturnCreated()
+        {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            // Arrange
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var mp3Bytes = new byte[]
+            {
+                // ID3v2 header
+                0x49, 0x44, 0x33, // "ID3"
+                0x04,              // Version 2.4
+                0x00,              // Revision
+                0x00,              // Flags
+                0x00, 0x00, 0x00, 0x00, // Tag size = 0
+
+                // MPEG frame header
+                0xFF, 0xFB
+            };
+
+            // Get dbContext
+            using var scope = _factory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<SfxDbContext>();
+
+            int categoryId = await dbContext.Categories
+                .Where(c => c.CategoryName == "FootStep")
+                .Select(c => c.Id)
+                .SingleAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(mp3Bytes);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue("audio/mpeg");
+
+            content.Add(fileContent, "File", "test.mp3");
+            content.Add(new StringContent("Test MP3"), "Title");
+            content.Add(new StringContent("Test MP3 description"), "Description");
+            content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/audioassets",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+        [Fact]
+        public async Task PostAudioAssets_Mp3WithInvalidId3v2Size_ReturnBadRequest()
+        {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
+
+            // Arrange
+            var client = _factory.CreateClient();
+            var token = CreateTestToken("AssetManager");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var mp3Bytes = new byte[]
+            {
+                // ID3v2 header
+                0x49, 0x44, 0x33, // "ID3"
+                0x04,              // Version
+                0x00,              // Revision
+                0x00,              // Flags
+
+                // Invalid synchsafe size
+                0x80, 0x00, 0x00, 0x00,
+
+                // MPEG frame header
+                0xFF, 0xFB
+            };
+
+            // Get dbContext
+            using var scope = _factory.Services.CreateScope();
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<SfxDbContext>();
+
+            int categoryId = await dbContext.Categories
+                .Where(c => c.CategoryName == "FootStep")
+                .Select(c => c.Id)
+                .SingleAsync();
+
+            using var content = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(mp3Bytes);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue("audio/mpeg");
+
+            content.Add(fileContent, "File", "test.mp3");
+            content.Add(new StringContent("Test MP3"), "Title");
+            content.Add(new StringContent("Test MP3 description"), "Description");
+            content.Add(new StringContent(categoryId.ToString()), "CategoryId");
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/audioassets",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         private string CreateTestToken(string role = "")
         {
             var key = new SymmetricSecurityKey(
@@ -195,6 +559,5 @@ namespace SoundEffectLibrary.Api.Tests
 
             return handler.WriteToken(token);
         }
-
     }
 }
