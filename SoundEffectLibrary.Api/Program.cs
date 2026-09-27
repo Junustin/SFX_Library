@@ -111,6 +111,11 @@ builder.Services
         };
     });
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+}
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<SfxDbContext>(options =>
@@ -134,6 +139,12 @@ if (app.Environment.IsDevelopment())
 {
     app.MapScalarApiReference();
     app.MapOpenApi();
+
+    app.MapPost("/api/dev/auth/token", (IJwtTokenService tokenService) =>
+    {
+        string token = tokenService.GetToken();
+        return token;
+    });
 }
 
 app.UseExceptionHandler();

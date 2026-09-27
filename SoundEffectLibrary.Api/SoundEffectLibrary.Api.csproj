@@ -33,4 +33,8 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.17.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Endpoints\" />
+  </ItemGroup>
+
 </Project>

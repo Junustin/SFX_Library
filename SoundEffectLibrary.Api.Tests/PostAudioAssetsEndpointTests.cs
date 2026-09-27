@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -69,7 +70,8 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
 
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -88,7 +90,8 @@ namespace SoundEffectLibrary.Api.Tests
             await _factory.SeedDataAsync();
 
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
            
 
@@ -115,7 +118,6 @@ namespace SoundEffectLibrary.Api.Tests
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
 
                 // Get dbContext
-                using var scope = _factory.Services.CreateScope();
                 var dbContext = scope.ServiceProvider
                     .GetRequiredService<SfxDbContext>();
 
@@ -181,7 +183,8 @@ namespace SoundEffectLibrary.Api.Tests
             await _factory.SeedDataAsync();
 
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
@@ -203,7 +206,6 @@ namespace SoundEffectLibrary.Api.Tests
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
 
                 // Get dbContext
-                using var scope = _factory.Services.CreateScope();
                 var dbContext = scope.ServiceProvider
                     .GetRequiredService<SfxDbContext>();
 
@@ -239,7 +241,8 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Arrange
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -250,7 +253,6 @@ namespace SoundEffectLibrary.Api.Tests
             };
 
             // Get dbContext
-            using var scope = _factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider
                 .GetRequiredService<SfxDbContext>();
 
@@ -286,7 +288,8 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Arrange
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -297,7 +300,6 @@ namespace SoundEffectLibrary.Api.Tests
             };
 
             // Get dbContext
-            using var scope = _factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider
                 .GetRequiredService<SfxDbContext>();
 
@@ -333,7 +335,8 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Arrange
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -344,7 +347,6 @@ namespace SoundEffectLibrary.Api.Tests
             };
 
             // Get dbContext
-            using var scope = _factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider
                 .GetRequiredService<SfxDbContext>();
 
@@ -380,7 +382,8 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Arrange
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -391,7 +394,6 @@ namespace SoundEffectLibrary.Api.Tests
             };
 
             // Get dbContext
-            using var scope = _factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider
                 .GetRequiredService<SfxDbContext>();
 
@@ -427,7 +429,8 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Arrange
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -446,7 +449,6 @@ namespace SoundEffectLibrary.Api.Tests
             };
 
             // Get dbContext
-            using var scope = _factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider
                 .GetRequiredService<SfxDbContext>();
 
@@ -482,7 +484,8 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Arrange
             var client = _factory.CreateClient();
-            var token = CreateTestToken("AssetManager");
+            using var scope = _factory.Services.CreateScope();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -503,7 +506,6 @@ namespace SoundEffectLibrary.Api.Tests
             };
 
             // Get dbContext
-            using var scope = _factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider
                 .GetRequiredService<SfxDbContext>();
 
