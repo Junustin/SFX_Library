@@ -222,7 +222,7 @@ namespace SoundEffectLibrary.Api.Tests
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync("/api/audioassets/test-error");
+            var response = await client.GetAsync("/api/test/test-error");
             var body = await response.Content.ReadAsStringAsync();
 
             // Assert
@@ -234,6 +234,8 @@ namespace SoundEffectLibrary.Api.Tests
         [Fact]
         public async Task GetAudioAssets_ExceedRateLimit_ReturnTooManyRequests()
         {
+            await _factory.ResetDatabaseAsync();
+            await _factory.SeedDataAsync();
             // Arrange
             var client = _factory.CreateClient();
 

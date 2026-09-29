@@ -54,6 +54,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
 
+            using var scope = _factory.Services.CreateScope();
             var token = CreateTestToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

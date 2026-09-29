@@ -14,7 +14,7 @@ namespace SoundEffectLibrary.Api.Controllers
     [EnableRateLimiting("per-ip")]
     public class AudioAssetsController : ControllerBase
     {
-        private const string AudioAssetsCachePrefix = "audioassets:";
+        public const string AudioAssetsCachePrefix = "audioassets:";
         public AudioAssetsController() { }
         
         [HttpPost]
