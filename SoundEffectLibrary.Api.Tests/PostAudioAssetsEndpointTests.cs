@@ -71,7 +71,7 @@ namespace SoundEffectLibrary.Api.Tests
             var client = _factory.CreateClient();
 
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -91,7 +91,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
            
 
@@ -184,7 +184,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
@@ -242,7 +242,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -289,7 +289,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -336,7 +336,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -383,7 +383,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -430,7 +430,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -485,7 +485,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken("AssetManager");
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
