@@ -42,7 +42,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            GetAudioAssetRespose? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetRespose>();
+            GetAudioAssetResponse? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetResponse>();
             Assert.Multiple(() =>
             {
                 Assert.Equal(1, assets!.Page);
@@ -70,7 +70,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            GetAudioAssetRespose? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetRespose>();
+            GetAudioAssetResponse? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetResponse>();
             Assert.Multiple(() =>
             {
                 Assert.Equal(2, assets!.Page);
@@ -98,7 +98,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            GetAudioAssetRespose? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetRespose>();
+            GetAudioAssetResponse? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetResponse>();
             Assert.Multiple(() =>
             {
                 Assert.Equal(2, assets!.Page);
@@ -123,7 +123,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            GetAudioAssetRespose? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetRespose>();
+            GetAudioAssetResponse? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetResponse>();
             Assert.Multiple(() =>
             {
                 Assert.Empty(assets!.Items);
@@ -146,7 +146,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            GetAudioAssetRespose? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetRespose>();
+            GetAudioAssetResponse? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetResponse>();
             Assert.Multiple(() =>
             {
                 Assert.Equal(2, assets!.Items.Count);
@@ -175,7 +175,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            GetAudioAssetRespose? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetRespose>();
+            GetAudioAssetResponse? assets = await response.Content.ReadFromJsonAsync<GetAudioAssetResponse>();
             Assert.Multiple(() =>
             {
                 Assert.Equal(2, assets!.Items.Count);

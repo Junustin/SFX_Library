@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
 using SoundEffectLibrary.Api.Services;
-using System.Security.Claims;
 
 namespace SoundEffectLibrary.Api.Controllers                  
 {
@@ -15,6 +14,7 @@ namespace SoundEffectLibrary.Api.Controllers
     [EnableRateLimiting("per-ip")]
     public class AudioAssetsController : ControllerBase
     {
+        private const string AudioAssetsCachePrefix = "audioassets:";
         public AudioAssetsController() { }
         
         [HttpPost]
@@ -23,6 +23,7 @@ namespace SoundEffectLibrary.Api.Controllers
         public async Task<ActionResult<AudioAsset>> AddAudio(
             [FromForm]CreateAudioAssetRequest request,
             CreateAudioAssetService createAudioAssetService,
+            ICacheService cache,
             CancellationToken cancellationToken)
         {
             var createResult = await createAudioAssetService.CreateAudioAssetAsync(request, cancellationToken);
@@ -30,41 +31,32 @@ namespace SoundEffectLibrary.Api.Controllers
             if (!createResult.Success)
                 return BadRequest(createResult.ErrorMessage);
 
+            // Cache invalidation
+            await cache.RemoveByPrefixAsync(AudioAssetsCachePrefix); 
+
             return CreatedAtAction(nameof(GetById), new { id = createResult.AudioAssetId }, createResult.response);
         }
 
         [HttpGet]
         [EnableRateLimiting("per-ip")]
-        public async Task<ActionResult<GetAudioAssetRespose>> GetAudioAssets(
-            SfxDbContext dbContext,
+        public async Task<ActionResult<GetAudioAssetResponse>> GetAudioAssets(
+            SearchAudioAssetPaginationService searchAudioAssetPaginationService,
+            ICacheService cache,
             [FromQuery] GetAudioAssetRequest request) 
         {
-            IQueryable<AudioAsset> audioAssets = dbContext.AudioAssets
-                .AsNoTracking()
-                .Include(a => a.Category);
+            var cacheKey = $"{AudioAssetsCachePrefix}search={request.Search}:page={request.Page}:pagesize={request.PageSize}";
 
-            if (!string.IsNullOrWhiteSpace(request.Search))
+            var cached = await cache.GetAsync<GetAudioAssetResponse>(cacheKey);
+
+            if(cached is not null)
             {
-                audioAssets = audioAssets.Where(a => 
-                    EF.Functions.ILike(a.Title, $"%{request.Search}%") 
-                    || EF.Functions.ILike(a.Category.CategoryName, $"%{request.Search}%"));
+                return Ok(cached);
             }
 
-            audioAssets = audioAssets
-                   .OrderBy(a => a.Category.CategoryName)
-                   .ThenBy(a => a.Title)
-                   .ThenBy(a => a.Id);
+            var result = await searchAudioAssetPaginationService.GetAudioAssets(request);
 
-            var totalCount = await audioAssets.CountAsync();
-
-            var skip = (request.Page - 1) * request.PageSize;
-           
-            var filteredAssets = await audioAssets
-                    .Skip(skip)
-                    .Take(request.PageSize)
-                    .ToListAsync();
-
-            
+            var filteredAssets = result.FilteredAssets;
+            var totalCount = result.TotalCount;
             var items = new List<AudioAssetCardResponse>();
 
             foreach (var asset in filteredAssets)
@@ -79,7 +71,10 @@ namespace SoundEffectLibrary.Api.Controllers
                     $"/api/audioassets/{asset.Id}/preview"
                 ));
             }
-            var response = new GetAudioAssetRespose(items, request.Page, request.PageSize, totalCount);
+            var response = new GetAudioAssetResponse(items, request.Page, request.PageSize, totalCount);
+
+            // Put response in cache
+            await cache.SetAsync(cacheKey, response, TimeSpan.FromSeconds(20));
 
             return Ok(response);
         }
@@ -191,14 +186,6 @@ namespace SoundEffectLibrary.Api.Controllers
                 default:
                     return BadRequest();
             }
-        }
-
-        [HttpGet("test-error")]
-        [DisableRateLimiting]
-        public IActionResult TestError()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            throw new Exception("This should never be exposed to the client.");
-        }
+        }  
     }
 }

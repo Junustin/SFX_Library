@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /.github
 /learning
+/SoundEffectLibrary.Api/postman/globals
+/SoundEffectLibrary.Api/.postman

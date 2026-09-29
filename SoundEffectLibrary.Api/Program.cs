@@ -10,6 +10,7 @@ using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Services;
 using System.Text;
 using System.Threading.RateLimiting;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +96,10 @@ builder.Services.AddProblemDetails(o =>
     };
 });
 
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetConnectionString("Redis")!));
+
 builder.Services
     .AddAuthentication("Bearer")
     .AddJwtBearer(options =>
@@ -121,11 +126,14 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<SfxDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+
 builder.Services.AddScoped<IAudioFileValidator, AudioFileValidator>();
 builder.Services.AddScoped<IAudioFileStorage, AudioFileStorage>();
 
 builder.Services.AddScoped<CreateAudioAssetService>();
 builder.Services.AddScoped<DeleteAudioAssetService>();
+builder.Services.AddScoped<SearchAudioAssetPaginationService>();
 builder.Services.AddScoped<GetAudioFileService>();
 
 builder.Services.Configure<AudioUploadOptions>(builder.Configuration.GetSection("AudioUpload"));

@@ -16,6 +16,6 @@ namespace SoundEffectLibrary.Api.Models
     public record DeleteAudioAssetResponse(Guid Id, string Title);
     public record AudioAssetCardResponse(Guid Id, string Title, CategoryResponse CategoryResponse, string PreviewFileUrl);
     public record GetAudioAssetRequest(string? Search, [Range(1, int.MaxValue)] int Page ,[Range(1, 100)] int PageSize);
-    public record GetAudioAssetRespose(List<AudioAssetCardResponse> Items, int Page, int PageSize, int TotalCount);
+    public record GetAudioAssetResponse(List<AudioAssetCardResponse> Items, int Page, int PageSize, int TotalCount);
     
 }
