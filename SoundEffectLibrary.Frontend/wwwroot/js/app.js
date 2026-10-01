@@ -8,6 +8,8 @@ const errorMessage = document.getElementById("error-message");
 const errorText = document.querySelector(".error-text");
 const tryagainButton = document.querySelector(".tryagain-button")
 
+const apiUrl = `http://localhost:8080`;
+
 // Audio player
 let currentAudio = null;
 let currentButton = null;
@@ -42,7 +44,7 @@ async function loadAssets(page, search) {
         loadingMessage.hidden = false;
         errorMessage.hidden = true;
 
-        const response = await fetch(`https://localhost:7096/api/audioassets?Search=${search}&Page=${currentPage}&PageSize=${pageSize}`);
+        const response = await fetch(`${apiUrl}/api/audioassets?Search=${search}&Page=${currentPage}&PageSize=${pageSize}`);
         if (!response.ok) {
             throw new Error(`HTTP Error: ${response.status}`)
         }
@@ -127,7 +129,7 @@ async function loadAssets(page, search) {
 
                 // Create audio for this card.
                 audio = new Audio(
-                    "https://localhost:7096" + asset.previewFileUrl
+                    `${apiUrl}` + asset.previewFileUrl
                 );
 
                 audio.addEventListener("loadedmetadata", () => {
@@ -177,7 +179,7 @@ async function loadAssets(page, search) {
 
             downloadButton.addEventListener("click", () => {
 
-                const fileUrl = `https://localhost:7096/api/audioassets/${asset.id}/files`;
+                const fileUrl = `${apiUrl}/api/audioassets/${asset.id}/files`;
 
                 const link = document.createElement('a');
                 link.href = fileUrl;
