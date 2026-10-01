@@ -29,7 +29,7 @@ namespace SoundEffectLibrary.Api.Services
             Directory.CreateDirectory(Path.Combine(_root.RootPath, AssetId.ToString()));
 
             // Build storage key
-            string storageKey = Path.Combine(AssetId.ToString(), guid.ToString() + extension);
+            string storageKey = $"{AssetId}/{guid}{extension}";
 
             // Combine root with storage key for file creation
             string filePath = Path.Combine(_root.RootPath, storageKey);
