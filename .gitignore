@@ -365,3 +365,7 @@ FodyWeavers.xsd
 /learning
 /SoundEffectLibrary.Api/postman/globals
 /SoundEffectLibrary.Api/.postman
+
+# For audio data directory
+data/audio/*
+!data/audio/.gitkeep
