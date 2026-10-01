@@ -15,5 +15,22 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/
 
+  api:
+    build:
+      context: ./SoundEffectLibrary.Api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=SfxLibrary;Username=postgres;Password=Jrust.pgrs"
+      ConnectionStrings__Redis: "redis:6379"
+      AudioStorage__RootPath: "/app/audio"
+    volumes:
+    - "E:/SoundEffectLibrary:/app/audio"
+    depends_on:
+      - postgres
+      - redis
+
 volumes:
   postgres_data:
