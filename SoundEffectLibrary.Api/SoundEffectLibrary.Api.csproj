@@ -4,22 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>d7021275-1fe6-4d4d-871f-9e5b5cdba35f</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Dtos\**" />
-    <Compile Remove="Repository\**" />
-    <Compile Remove="SoundEffectLibrary.Api.Api\**" />
-    <Content Remove="Dtos\**" />
-    <Content Remove="Repository\**" />
-    <Content Remove="SoundEffectLibrary.Api.Api\**" />
-    <EmbeddedResource Remove="Dtos\**" />
-    <EmbeddedResource Remove="Repository\**" />
-    <EmbeddedResource Remove="SoundEffectLibrary.Api.Api\**" />
-    <None Remove="Dtos\**" />
-    <None Remove="Repository\**" />
-    <None Remove="SoundEffectLibrary.Api.Api\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />

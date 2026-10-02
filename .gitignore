@@ -369,3 +369,5 @@ FodyWeavers.xsd
 # For audio data directory
 data/audio/*
 !data/audio/.gitkeep
+
+.env

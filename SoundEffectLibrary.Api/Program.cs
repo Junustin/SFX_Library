@@ -14,11 +14,12 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var frontendOrigin = builder.Configuration["Cors:FrontendOrigin"];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins("https://localhost:7113")
+        policy.WithOrigins(frontendOrigin!)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -140,6 +141,14 @@ builder.Services.Configure<AudioUploadOptions>(builder.Configuration.GetSection(
 builder.Services.Configure<AudioStorageOptions>(builder.Configuration.GetSection("AudioStorage"));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SfxDbContext>();
+
+    dbContext.Database.Migrate();
+}
+
 app.UseCors("Frontend");
 
 // Configure the HTTP request pipeline.
@@ -150,7 +159,7 @@ if (app.Environment.IsDevelopment())
 
     app.MapPost("/api/dev/auth/token", (IJwtTokenService tokenService) =>
     {
-        string token = tokenService.GetToken();
+        string token = tokenService.GetAssetManagerToken();
         return token;
     });
 }
