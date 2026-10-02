@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SoundEffectLibrary.Api.Data;
@@ -55,7 +56,7 @@ namespace SoundEffectLibrary.Api.Tests
             var client = _factory.CreateClient();
 
             using var scope = _factory.Services.CreateScope();
-            var token = CreateTestToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetNoRoleToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -72,7 +73,7 @@ namespace SoundEffectLibrary.Api.Tests
             var client = _factory.CreateClient();
 
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -92,7 +93,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
            
 
@@ -185,7 +186,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
@@ -243,7 +244,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -290,7 +291,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -337,7 +338,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -384,7 +385,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -431,7 +432,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -486,7 +487,7 @@ namespace SoundEffectLibrary.Api.Tests
             // Arrange
             var client = _factory.CreateClient();
             using var scope = _factory.Services.CreateScope();
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
@@ -533,34 +534,6 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        private string CreateTestToken(string role = "")
-        {
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("this-is-my-secret-signingkey-for-using-in-development-it-is-not-the-real-key-so-dont-worry-about-it"));
-
-            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, "user-123"));
-
-            if (!string.IsNullOrWhiteSpace(role))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var token = new JwtSecurityToken(
-                issuer: "library-auth",
-                audience: "library-api",
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(5),
-                signingCredentials: credential
-                );
-
-            var handler = new JwtSecurityTokenHandler();
-
-            return handler.WriteToken(token);
         }
     }
 }

@@ -85,7 +85,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             using var scope = _factory.Services.CreateScope();
 
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // 1stGet set first cache key
@@ -175,7 +175,7 @@ namespace SoundEffectLibrary.Api.Tests
 
             using var scope = _factory.Services.CreateScope();
 
-            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetToken();
+            var token = scope.ServiceProvider.GetRequiredService<IJwtTokenService>().GetAssetManagerToken();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // 1stGet set first cache key

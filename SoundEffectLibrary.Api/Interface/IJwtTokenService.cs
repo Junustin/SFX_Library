@@ -2,6 +2,7 @@
 {
     public interface IJwtTokenService
     {
-        public string GetToken();
+        public string GetAssetManagerToken();
+        public string GetNoRoleToken();
     }
 }

@@ -13,7 +13,7 @@ namespace SoundEffectLibrary.Api.Services
         {
             _configuration = configuration;
         }
-        public string GetToken()
+        public string GetAssetManagerToken()
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]!));
 
@@ -23,6 +23,28 @@ namespace SoundEffectLibrary.Api.Services
             claims.Add(new Claim(ClaimTypes.NameIdentifier, "dev-user"));
 
             claims.Add(new Claim(ClaimTypes.Role, "AssetManager"));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(5),
+                signingCredentials: credential
+                );
+
+            var handler = new JwtSecurityTokenHandler();
+
+            return handler.WriteToken(token);
+        }
+
+        public string GetNoRoleToken()
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]!));
+
+            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, "dev-user"));
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
