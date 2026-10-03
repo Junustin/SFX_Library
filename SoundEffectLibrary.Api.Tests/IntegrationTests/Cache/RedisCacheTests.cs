@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SoundEffectLibrary.Api.Controllers;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Dtos;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
 using System.Net;

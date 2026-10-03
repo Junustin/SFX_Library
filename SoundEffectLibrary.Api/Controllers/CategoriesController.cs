@@ -1,15 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Dtos;
 using SoundEffectLibrary.Api.Models;
 
 namespace SoundEffectLibrary.Api.Controllers
 {
     [ApiController]
     [Route("api/categories")]
+    [EnableRateLimiting("per-ip")]
     public class CategoriesController : ControllerBase
     {
         [HttpPost]
+        [Authorize(Roles = "AssetManager")]
         public async Task<ActionResult<Category>> AddCategory (
             CreateCategoryRequest request, 
             SfxDbContext dbContext)

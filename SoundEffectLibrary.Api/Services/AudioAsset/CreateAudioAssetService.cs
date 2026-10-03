@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SoundEffectLibrary.Api.Data;
+﻿using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Dtos;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
 

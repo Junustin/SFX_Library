@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Dtos;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text;
 using Xunit.Abstractions;
 
 namespace SoundEffectLibrary.Api.Tests

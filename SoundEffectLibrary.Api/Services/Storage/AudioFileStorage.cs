@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Options;
-using SoundEffectLibrary.Api.Api.Services;
+using SoundEffectLibrary.Api.Configuration;
 using SoundEffectLibrary.Api.Interface;
 
 namespace SoundEffectLibrary.Api.Services

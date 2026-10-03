@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Interface;
-using SoundEffectLibrary.Api.Models;
 
 namespace SoundEffectLibrary.Api.Services
 {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
+using SoundEffectLibrary.Api.Dtos;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Models;
 using SoundEffectLibrary.Api.Services;
@@ -156,6 +157,7 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AssetManager")]
         [EnableRateLimiting("per-ip")]
         public async Task<ActionResult<AudioAsset>> DeleteAsset(
             Guid id,

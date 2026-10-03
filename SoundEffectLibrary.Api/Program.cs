@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using SoundEffectLibrary.Api.Api.Services;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Interface;
 using SoundEffectLibrary.Api.Services;
 using System.Text;
 using System.Threading.RateLimiting;
 using StackExchange.Redis;
+using SoundEffectLibrary.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,9 +86,9 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-builder.Services.AddProblemDetails(o =>
+builder.Services.AddProblemDetails(options =>
 {
-    o.CustomizeProblemDetails = context =>
+    options.CustomizeProblemDetails = context =>
     {
         context.ProblemDetails.Instance = 
             $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
@@ -97,9 +97,12 @@ builder.Services.AddProblemDetails(o =>
     };
 });
 
+var redisOptions = ConfigurationOptions.Parse(
+    builder.Configuration.GetConnectionString("Redis")!);
+
+redisOptions.BacklogPolicy = BacklogPolicy.FailFast;
 builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect(
-        builder.Configuration.GetConnectionString("Redis")!));
+    ConnectionMultiplexer.Connect(redisOptions));
 
 builder.Services
     .AddAuthentication("Bearer")

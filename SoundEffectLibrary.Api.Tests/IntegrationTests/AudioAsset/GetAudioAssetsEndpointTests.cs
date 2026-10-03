@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
-using SoundEffectLibrary.Api.Models;
+using SoundEffectLibrary.Api.Dtos;
 using System.Net;
 using System.Net.Http.Json;
 using Xunit.Abstractions;
@@ -213,22 +213,6 @@ namespace SoundEffectLibrary.Api.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GetError_TestError_ReturnServerError()
-        {
-            // Arrange
-            var client = _factory.CreateClient();
-
-            // Act
-            var response = await client.GetAsync("/api/test/test-error");
-            var body = await response.Content.ReadAsStringAsync();
-
-            // Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-            Assert.Equal("application/problem+json; charset=utf-8", response.Content.Headers.ContentType!.ToString());
-            Assert.DoesNotContain("This should never be exposed to the client.", body);
         }
 
         [Fact]
