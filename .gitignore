@@ -371,3 +371,4 @@ data/audio/*
 !data/audio/.gitkeep
 
 .env
+.idea
