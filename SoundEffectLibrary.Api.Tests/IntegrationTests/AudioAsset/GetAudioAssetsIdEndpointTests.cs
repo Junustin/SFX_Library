@@ -6,14 +6,14 @@ using Xunit.Abstractions;
 
 namespace SoundEffectLibrary.Api.Tests
 {
-    public class GetAudioAssetsIdEndpointTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestDatabaseFixture>, IAsyncLifetime
+    public class GetAudioAssetsIdEndpointTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestDatabaseFixture>, IClassFixture<TestRedisFixture>, IAsyncLifetime
     {
         private readonly CustomWebApplicationFactory _factory;
         private readonly ITestOutputHelper _output;
 
-        public GetAudioAssetsIdEndpointTests(TestDatabaseFixture database, ITestOutputHelper output)
+        public GetAudioAssetsIdEndpointTests(TestDatabaseFixture database, TestRedisFixture redis, ITestOutputHelper output)
         {
-            _factory = new CustomWebApplicationFactory(database);
+            _factory = new CustomWebApplicationFactory(database, redis);
             _output = output;
         }
         public async Task InitializeAsync()

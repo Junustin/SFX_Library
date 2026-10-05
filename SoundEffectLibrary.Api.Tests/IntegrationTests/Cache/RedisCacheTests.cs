@@ -5,21 +5,20 @@ using SoundEffectLibrary.Api.Controllers;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Dtos;
 using SoundEffectLibrary.Api.Interface;
-using SoundEffectLibrary.Api.Models;
 using System.Net;
 using System.Net.Http.Headers;
 using Xunit.Abstractions;
 
 namespace SoundEffectLibrary.Api.Tests
 {
-    public class RedisCacheTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestDatabaseFixture>, IAsyncLifetime
+    public class RedisCacheTests : IClassFixture<TestDatabaseFixture>, IClassFixture<TestRedisFixture>, IAsyncLifetime
     {
         private readonly CustomWebApplicationFactory _factory;
         private readonly ITestOutputHelper _output;
 
-        public RedisCacheTests(TestDatabaseFixture database, ITestOutputHelper output)
+        public RedisCacheTests(TestDatabaseFixture database, TestRedisFixture redis,ITestOutputHelper output)
         {
-            _factory = new CustomWebApplicationFactory(database);
+            _factory = new CustomWebApplicationFactory(database, redis);
             _output = output;
         }
 

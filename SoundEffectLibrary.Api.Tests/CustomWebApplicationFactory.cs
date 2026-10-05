@@ -6,16 +6,19 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Models;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 
 namespace SoundEffectLibrary.Api.Tests
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         private readonly TestDatabaseFixture _database;
+        private readonly TestRedisFixture _redis;
         public string TestStoragePath { get; }
-        public CustomWebApplicationFactory(TestDatabaseFixture database)
+        public CustomWebApplicationFactory(TestDatabaseFixture database, TestRedisFixture redis)
         {
             _database = database;
+            _redis = redis;
 
             TestStoragePath = Path.Combine(
                     Path.GetTempPath(),
@@ -32,13 +35,21 @@ namespace SoundEffectLibrary.Api.Tests
                 });
             });
 
-            // Replace original database with test container database
+            // Replace original services with test container services
             builder.ConfigureServices(services =>
             {
+                // Replace postgresql
                 services.RemoveAll<SfxDbContext>();
 
                 services.AddDbContext<SfxDbContext>(options =>
                     options.UseNpgsql(_database.ConnectionString));
+
+                // Replace redis
+                services.RemoveAll<IConnectionMultiplexer>();
+
+                services.AddSingleton<IConnectionMultiplexer>(
+                    ConnectionMultiplexer.Connect(
+                        _redis.ConnectionString));
             });
         }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Dtos;
@@ -12,14 +11,14 @@ using Xunit.Abstractions;
 
 namespace SoundEffectLibrary.Api.Tests
 {
-    public class PostAudioAssetsEndpointTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestDatabaseFixture>, IAsyncLifetime
+    public class PostAudioAssetsEndpointTests : IClassFixture<TestRedisFixture>, IClassFixture<TestDatabaseFixture>, IAsyncLifetime
     {
         private readonly CustomWebApplicationFactory _factory;
         private readonly ITestOutputHelper _output;
 
-        public PostAudioAssetsEndpointTests(TestDatabaseFixture database, ITestOutputHelper output)
+        public PostAudioAssetsEndpointTests(TestDatabaseFixture database, TestRedisFixture redis,ITestOutputHelper output)
         {
-            _factory = new CustomWebApplicationFactory(database);
+            _factory = new CustomWebApplicationFactory(database, redis);
             _output = output;
         }
         public async Task InitializeAsync()

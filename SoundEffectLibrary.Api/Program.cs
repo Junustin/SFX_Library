@@ -71,8 +71,8 @@ builder.Services.AddRateLimiter(options =>
                 ipAddress,
             _ => new TokenBucketRateLimiterOptions
             {
-                TokenLimit = 5,
-                TokensPerPeriod = 2,
+                TokenLimit = 30,
+                TokensPerPeriod = 15,
                 ReplenishmentPeriod = TimeSpan.FromSeconds(10)
             });
         }
@@ -97,12 +97,17 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
-var redisOptions = ConfigurationOptions.Parse(
-    builder.Configuration.GetConnectionString("Redis")!);
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
 
-redisOptions.BacklogPolicy = BacklogPolicy.FailFast;
-builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect(redisOptions));
+    var redisOptions = ConfigurationOptions.Parse(
+        configuration.GetConnectionString("Redis")!);
+
+    redisOptions.BacklogPolicy = BacklogPolicy.FailFast;
+
+    return ConnectionMultiplexer.Connect(redisOptions);
+});
 
 builder.Services
     .AddAuthentication("Bearer")
