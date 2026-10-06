@@ -1,16 +1,28 @@
 # SFX Library - Backend Asset Management API
 ## Overview
-SFX Library is a backend-focused application for managing and serving sound-effect assets. It was built as a personal learning and portfolio project to develop practical experience with backend engineering.
-
-The project focuses on how an application behaves as a complete system. The goal is to demonstrate understanding through implementation and engineering decisions.
+SFX Library is a backend-focused application for managing and serving sound-effect assets. It was built as a personal tool and learning/portfolio project to develop practical experience with backend engineering.
 
 ## What This Project Does
-SFX Library provides an API for managing a collection of sound-effect assets.
+This project is intended to be an audio asset management tool for teams or organizations that need a centralized place to store, organize, and share sound-effect assets.
+
+For example, in a game development environment, a sound designer could upload and categorize audio assets so that other teams, such as animation or video editing, can search the library and retrieve the sounds they need without having to request each asset directly from the sound design team.
+
 ### Users can
-* Browse and search available sound effect assets.
-* Create upload and manage audio assets.
-* Preview and download audio assets.
-* Organize assets using categories.
+* Creating, uploading, and managing audio assets.
+* Organizing assets using categories and metadata.
+* Searching and retrieving audio assets.
+* Previewing and downloading audio files.
+* Controlling access to management operations through authentication and authorization.
+
+A lightweight web client is currently included to demonstrate browsing, searching, previewing, and downloading assets. Management workflows are currently performed through the API using Scalar/OpenAPI.
+
+## Preview & Demo
+A short demo showing the current web client
+* Browse and search audio assets.
+* Preview audio files.
+* Download audio files.
+
+https://github.com/user-attachments/assets/528d4c20-3d33-4c00-b93b-f0b310963852
 
 ## Technology Stack
 | Domain | Technology | Purpose |
@@ -23,7 +35,7 @@ SFX Library provides an API for managing a collection of sound-effect assets.
 
 ## Key Feature Highlights
 * **Stream-Based File Delivery:** Streams audio files directly from storage for preview and download.
-* **Security-First File Signature Validation:** Inspects raw magic byte headers on incoming files (verifying `.wav`, `MPEG`, etc.) rather than relying on spoofable client file extensions or MIME types.
+* **Security-First File Signature Validation:** Inspects raw magic byte headers on incoming files. (verifying `.wav`, `MPEG`.)
 * **Smart Redis Caching:** Caches category structures and high-traffic metadata queries with explicit cache-invalidation triggers during asset updates/deletions.
 * **Automated Containerized Integration Testing:** Features an integration test suite that spins up ephemeral PostgreSQL containers in Docker to validate real database state, migrations, and constraint enforcement.
   
@@ -84,8 +96,8 @@ Persistent application data is stored outside the application container, with Po
 
 ## Getting Started
 ### Prerequisites
-Docker
-Docker Compose
+* Docker
+* Docker Compose
 
 ### Run the Application
 Clone the repository, configure the required environment variables using .env.example, then start the application with Docker Compose.
