@@ -20,6 +20,7 @@ namespace SoundEffectLibrary.Api.Controllers
         
         [HttpPost]
         [Authorize(Roles = "AssetManager")]
+        [EnableRateLimiting("per-ip")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<AudioAsset>> AddAudio(
             [FromForm]CreateAudioAssetRequest request,
@@ -30,7 +31,12 @@ namespace SoundEffectLibrary.Api.Controllers
             var createResult = await createAudioAssetService.CreateAudioAssetAsync(request, cancellationToken);
 
             if (!createResult.Success)
-                return BadRequest(createResult.ErrorMessage);
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Bad Request",
+                    Detail = createResult.ErrorMessage,
+                    Status = 400
+                });
 
             // Cache invalidation
             await cache.RemoveByPrefixAsync(AudioAssetsCachePrefix); 
@@ -93,16 +99,19 @@ namespace SoundEffectLibrary.Api.Controllers
 
             if (audioAsset == null)
             {
-                return Problem(
-                    title: "Asset not found",
-                    detail: "The requested audio asset was not found.",
-                    statusCode: 404);
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Not Found",
+                    Detail = "Asset not found.",
+                    Status = 404
+                });
             }
 
             return Ok(audioAsset);
         }
 
         [HttpGet("{id}/files")] // For download file
+        [EnableRateLimiting("per-ip")]
         public async Task<ActionResult> GetFile(
             Guid id,
             CancellationToken cancellationToken,
@@ -114,22 +123,44 @@ namespace SoundEffectLibrary.Api.Controllers
                 return File(result.Stream!, result.ContentType!, result.FileName!);
 
              if (result.FailureType is null) // Should not happen but just in case.
-                return Problem();
+                return Problem(
+                    title: "Internal server error",
+                    statusCode: 500
+                    );
 
-             switch (result.FailureType)
-             {
-                case GetAudioFileFailureType.AssetNotFound :
-                    return NotFound();
-                case GetAudioFileFailureType.FileNotFound :
-                    return Problem(); 
+            switch (result.FailureType)
+            {
+                case GetAudioFileFailureType.AssetNotFound:
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "Asset not found.",
+                        Status = 404
+                    });
+                case GetAudioFileFailureType.FileNotFound:
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "File not found.",
+                        Status = 404
+                    }); 
                 case GetAudioFileFailureType.StorageError :
-                    return Problem();
+                    return Problem(
+                        title: "Internal server error",
+                        statusCode: 500
+                        );
                 default: 
-                    return BadRequest();
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "Bad Request",
+                        Detail = "Request is invalid.",
+                        Status = 400
+                    });
              }
          }
 
         [HttpGet("{id}/preview")] // Used for preview audio file
+        [EnableRateLimiting("per-ip")]
         public async Task<ActionResult> GetCardPreview(
             Guid id,
             CancellationToken cancellationToken,
@@ -141,18 +172,39 @@ namespace SoundEffectLibrary.Api.Controllers
                 return File(result.Stream!, result.ContentType!);
 
             if (result.FailureType is null) // Should not happen but just in case.
-                return Problem();
+                return Problem(
+                    title: "Internal server error",
+                    statusCode: 500
+                    );
 
             switch (result.FailureType)
             {
                 case GetAudioFileFailureType.AssetNotFound:
-                    return NotFound();
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "Asset not found.",
+                        Status = 404
+                    });
                 case GetAudioFileFailureType.FileNotFound:
-                    return Problem();
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "File not found.",
+                        Status = 404
+                    });
                 case GetAudioFileFailureType.StorageError:
-                    return Problem();
+                    return Problem(
+                        title: "Internal server error.",
+                        statusCode: 500
+                        );         
                 default:
-                    return BadRequest();
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "BadRequest",
+                        Detail = "Request is invalid.",
+                        Status = 400
+                    });
             }
         }
 
@@ -172,21 +224,40 @@ namespace SoundEffectLibrary.Api.Controllers
             switch (deleteResult.FailureType)
             {
                 case DeleteAssetFailureType.AssetNotFound:
-                    return NotFound();
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "Asset not found.",
+                        Status = 404
+                    });
                 case DeleteAssetFailureType.FileNotFound:
-                    return Problem(
-                        detail: "File not found."
-                        );
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "File not found.",
+                        Status = 404
+                    });
                 case DeleteAssetFailureType.DeleteRecordFailed:
-                    return Problem(
-                        detail: "Delete record failed."
-                        );
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "Delete record failed.",
+                        Status = 404
+                    });
                 case DeleteAssetFailureType.DeleteFileFailed:
-                    return Problem(
-                        detail: "Delete file failed."
-                        );
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Not Found",
+                        Detail = "Delete file failed.",
+                        Status = 404
+                    });
                 default:
-                    return BadRequest();
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "BadRequest",
+                        Detail = "Invalid request.",
+                        Status = 400
+                    });
             }
         }  
     }

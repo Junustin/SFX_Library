@@ -15,12 +15,18 @@ namespace SoundEffectLibrary.Api.Controllers
     {
         [HttpPost]
         [Authorize(Roles = "AssetManager")]
+        [EnableRateLimiting("per-ip")]
         public async Task<ActionResult<Category>> AddCategory (
             CreateCategoryRequest request, 
             SfxDbContext dbContext)
         {
             if (string.IsNullOrWhiteSpace(request.CategoryName))
-                return BadRequest("Category name must not be null.");
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Bad Request",
+                    Detail = "Category name must not be empty.",
+                    Status = 400
+                });
             var category = new Category
             {
                 
@@ -34,12 +40,32 @@ namespace SoundEffectLibrary.Api.Controllers
         }
 
         [HttpGet]
+        [EnableRateLimiting("per-ip")]
         public async Task<ActionResult<IReadOnlyList<Category>>> GetAllCategory(
             SfxDbContext dbContext)
         {
             var categories = await dbContext.Categories.ToListAsync();
 
             return Ok(categories);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "AssetManager")]
+        [EnableRateLimiting("per-ip")]
+        public async Task<IActionResult> DeleteCategory(
+            int id, 
+            SfxDbContext dbContext,
+            CancellationToken cancellationToken)
+        {
+            await dbContext
+                .Categories
+                .AsNoTracking()
+                .Where(c => c.Id == id)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return NoContent();
         }
     }
 }
