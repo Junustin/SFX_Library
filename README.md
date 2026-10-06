@@ -110,7 +110,16 @@ For the production-like configuration:
 ```
  docker compose -f compose.production.yaml up --build
 ```
-Configuration and secret values should be provided through environment variables rather than committed to the repository.
+## API Usage
+Management endpoints require authentication.
+For local development:
+
+1. Start the application with Docker Compose.
+2. Open Scalar (http://localhost:8080/scalar/v1) and use the development authentication endpoint to obtain a JWT.
+3. Authorize the Scalar client using the returned Bearer token.
+4. Use the authenticated endpoints to upload or delete audio assets.
+
+The public web client does not require authentication for browsing, searching, previewing, and downloading assets.
 
 ## Known Issues & Limitations
 * HTTPS and a reverse proxy are not currently configured.
