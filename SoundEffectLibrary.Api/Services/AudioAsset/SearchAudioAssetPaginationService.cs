@@ -26,8 +26,8 @@ namespace SoundEffectLibrary.Api.Services
             }
 
             audioAssets = audioAssets
-                   .OrderBy(a => a.Category.CategoryName)
-                   .ThenBy(a => a.Title)
+                   .OrderBy(a => a.Title)
+                   .ThenBy(a => a.Category.CategoryName)
                    .ThenBy(a => a.Id);
 
             var totalCount = await audioAssets.CountAsync();

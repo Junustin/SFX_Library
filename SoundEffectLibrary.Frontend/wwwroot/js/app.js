@@ -19,7 +19,7 @@ let audio = null;
 
 // Pagination
 let currentPage = 1;
-let pageSize = 3;
+let pageSize = 5;
 let pageCount = 1;
 
 // Search

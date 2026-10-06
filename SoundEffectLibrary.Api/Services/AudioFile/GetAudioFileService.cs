@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using SoundEffectLibrary.Api.Data;
 using SoundEffectLibrary.Api.Interface;
+using System.Net.Mime;
 
 namespace SoundEffectLibrary.Api.Services
 {
@@ -34,7 +36,16 @@ namespace SoundEffectLibrary.Api.Services
             if (stream is null)
                 return GetFailed($"Storage  error", GetAudioFileFailureType.StorageError); // Storage failed to get file
 
-            return GetSuccess(stream, file.FileName, file.ContentType);
+
+            // Detemine file extension
+            var provider = new FileExtensionContentTypeProvider();
+            var extension = provider.Mappings
+                                .FirstOrDefault(m => m.Value
+                                .Equals(file.ContentType, StringComparison.OrdinalIgnoreCase))
+                                .Key;
+            var downloadName = asset.Title + extension;
+
+            return GetSuccess(stream, downloadName, file.ContentType);
         }
 
         private GetAudioFileResult GetSuccess(Stream stream, string fileName, string contentType)
