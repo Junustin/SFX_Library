@@ -117,7 +117,9 @@ For local development:
 1. Start the application with Docker Compose.
 2. Open Scalar (http://localhost:8080/scalar/v1) and use the development authentication endpoint to obtain a JWT.
 3. Authorize the Scalar client using the returned Bearer token.
-4. Use the authenticated endpoints to upload or delete audio assets.
+4. Create a category.
+5. Create an audio asset and assign it to the category.
+6. Use the authenticated endpoints to upload or delete audio assets.
 
 The public web client does not require authentication for browsing, searching, previewing, and downloading assets.
 
